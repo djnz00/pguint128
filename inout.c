@@ -3,10 +3,10 @@
 #include <utils/builtins.h>
 
 #include "uint.h"
+#include "ntoa.h"
 
-#include <inttypes.h>
+/* #include <inttypes.h> */
 #include <limits.h>
-
 
 /*
  * Copy of old pg_atoi() from PostgreSQL, cut down to support int8 only.
@@ -76,7 +76,8 @@ int1out(PG_FUNCTION_ARGS)
 	int8		arg1 = PG_GETARG_INT8(0);
 	char	   *result = palloc(5);		/* sign, 3 digits, '\0' */
 
-	sprintf(result, "%d", arg1);
+	itoa8(result, arg1);
+	/* sprintf(result, "%d", arg1); */
 	PG_RETURN_CSTRING(result);
 }
 
@@ -159,7 +160,8 @@ uint1out(PG_FUNCTION_ARGS)
 	uint8		arg1 = PG_GETARG_UINT8(0);
 	char	   *result = palloc(4);		/* 3 digits, '\0' */
 
-	sprintf(result, "%u", arg1);
+	utoa8(result, arg1);
+	/* sprintf(result, "%u", arg1); */
 	PG_RETURN_CSTRING(result);
 }
 
@@ -179,7 +181,8 @@ uint2out(PG_FUNCTION_ARGS)
 	uint16		arg1 = PG_GETARG_UINT16(0);
 	char	   *result = palloc(6);		/* 5 digits, '\0' */
 
-	sprintf(result, "%u", arg1);
+	utoa32(result, arg1);
+	/* sprintf(result, "%u", arg1); */
 	PG_RETURN_CSTRING(result);
 }
 
@@ -199,7 +202,8 @@ uint4out(PG_FUNCTION_ARGS)
 	uint32		arg1 = PG_GETARG_UINT32(0);
 	char	   *result = palloc(11);	/* 10 digits, '\0' */
 
-	sprintf(result, "%u", arg1);
+	utoa32(result, arg1);
+	/* sprintf(result, "%u", arg1); */
 	PG_RETURN_CSTRING(result);
 }
 
@@ -252,6 +256,7 @@ uint8out(PG_FUNCTION_ARGS)
 	uint64		arg1 = PG_GETARG_UINT64(0);
 	char	   *result = palloc(21);	/* 20 digits, '\0' */
 
-	sprintf(result, "%"PRIu64, (uint64_t) arg1);
+	utoa64(result, arg1);
+	/* sprintf(result, "%"PRIu64, (uint64_t) arg1); */
 	PG_RETURN_CSTRING(result);
 }

@@ -19,7 +19,7 @@ DATA_built = uint--$(extension_version).sql
 REGRESS = init hash hex operators misc drop
 REGRESS_OPTS = --inputdir=test
 
-EXTRA_CLEAN += operators.c operators.sql test/sql/operators.sql
+EXTRA_CLEAN += operators.c operators.sql test/sql/operators.sql ntoa_test.o ntoa_test
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
@@ -36,3 +36,15 @@ python-check: generate.py
 	pep8 $^
 	pyflakes $^
 	pylint $^
+
+ntoa_test.o: ntoa_test.c
+	$(CC) $^ -c -O3 -g
+
+ntoa_test: ntoa_test.o
+	$(CC) $^ -O3 -g -o $@
+
+ntoa-check: ntoa_test
+	./ntoa_test
+
+inout.o: ntoa.h
+ntoa_test.o: ntoa.h
