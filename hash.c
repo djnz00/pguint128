@@ -31,3 +31,22 @@ hashuint8(PG_FUNCTION_ARGS)
 
 	return hash_uint32(lohalf);
 }
+
+/* carefully crafted, see comments in hashint8 */
+PG_FUNCTION_INFO_V1(hashuint16);
+Datum
+hashuint16(PG_FUNCTION_ARGS)
+{
+	/* see also hashint8 */
+	uint128_t	val = *(uint128_t *)PG_GETARG_POINTER(0);
+	uint32		q0 = (uint32) val;
+	uint32		q1 = (uint32) (val >> 32);
+	uint32		q2 = (uint32) (val >> 64);
+	uint32		q3 = (uint32) (val >> 96);
+
+	q2 ^= q3;
+	q1 ^= q2;
+	q0 ^= q1;
+
+	return hash_uint32(q0);
+}

@@ -1,3 +1,5 @@
+#include <ctype.h>
+
 #include <postgres.h>
 #include <fmgr.h>
 #include <libpq/pqformat.h>
@@ -364,5 +366,123 @@ uint8send(PG_FUNCTION_ARGS)
 
 	pq_begintypsend(&buf);
 	pq_sendint64(&buf, arg1);
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
+}
+
+static unsigned int
+atou128(const char *s, uint128_t *r)
+{
+    int c = s[0];
+	uint128_t v;
+	unsigned int o;
+	if (unlikely(c < '0' || c > '9')) return 0;
+	v = c - '0';
+	o = 1;
+	while (likely(o < 39 && (c = s[o]) >= '0' && c <= '9')) {
+		v = v * 10 + (c - '0');
+		++o;
+	}
+	*r = v;
+	return o;
+}
+
+static unsigned int
+atoi128(const char *s, int128_t *r)
+{
+	unsigned int o;
+	if (s[0] == '-') {
+		o = atou128(&s[1], (uint128_t *)r);
+		if (!o || *r < 0) return 0;
+		*r = -*r;
+		return o + 1;
+	} else {
+		o = atou128(s, (uint128_t *)r);
+		if (*r < 0) return 0;
+		return o;
+	}
+}
+
+PG_FUNCTION_INFO_V1(int16in);
+Datum
+int16in(PG_FUNCTION_ARGS)
+{
+	int128_t *v = (int128_t *)palloc(sizeof(int128_t));
+	const char *s = PG_GETARG_CSTRING(0);
+	unsigned int n = atoi128(s, v);
+
+	/* SQL requires trailing spaces to be ignored while erroring out on other
+	 * "trailing junk" */
+	if (likely(n)) while (unlikely(isspace(s[n]))) ++n;
+	if (!n || s[n])
+		ereport(
+			ERROR,
+			(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+			 errmsg("invalid input syntax for int128: \"%s\"", s)));
+
+	PG_RETURN_POINTER(v);
+}
+
+PG_FUNCTION_INFO_V1(int16out);
+Datum
+int16out(PG_FUNCTION_ARGS)
+{
+	int128_t		arg1 = *(int128_t *)PG_GETARG_POINTER(0);
+	char			*result = palloc(41);	/* sign, 39 digits, '\0' */
+	itoa128(result, arg1);
+	PG_RETURN_CSTRING(result);
+}
+
+PG_FUNCTION_INFO_V1(uint16in);
+Datum
+uint16in(PG_FUNCTION_ARGS)
+{
+	uint128_t		arg1 = *(uint128_t *)PG_GETARG_POINTER(0);
+	char			*result = palloc(40);	/* 39 digits, '\0' */
+	utoa128(result, arg1);
+	PG_RETURN_CSTRING(result);
+}
+
+#include <port/pg_bswap.h>
+#ifndef pg_bswap128
+#ifdef WORDS_BIGENDIAN
+#define pg_bswap128(x) (x)
+#else
+#if defined(__GNUC__) && !defined(__llvm__)
+#define pg_bswap128(x) __builtin_bswap128(x)
+#else
+inline static uint128_t
+pg_bswap128(uint128_t i)
+{
+	return
+		((uint128_t)(pg_bswap64(i))<<64) |
+		(uint128_t)pg_bswap64(i>>64);
+}
+#endif /* __GNUC__ && !__llvm__ */
+#endif /* WORDS_BIGENDIAN */
+#endif /* pg_bswap128 */
+
+PG_FUNCTION_INFO_V1(uint16recv);
+Datum
+uint16recv(PG_FUNCTION_ARGS)
+{
+	StringInfo buf = (StringInfo)PG_GETARG_POINTER(0);
+	uint128_t *v = (uint128_t *)palloc(sizeof(uint128_t));
+	pq_copymsgbytes(buf, (char *)v, 16);
+	*v = pg_bswap128(*v);
+	PG_RETURN_POINTER(v);
+}
+
+PG_FUNCTION_INFO_V1(uint16send);
+Datum
+uint16send(PG_FUNCTION_ARGS)
+{
+	uint128_t value = *(uint128_t *)PG_GETARG_POINTER(0);
+	StringInfoData buf;
+	pq_begintypsend(&buf);
+	enlargeStringInfo(&buf, 16);
+	Assert(buf.len + 16 <= buf.maxlen);
+	value = pg_bswap128(value);
+	memcpy((char *)(buf.data + buf.len), &value, 16);
+	buf.len += 16;
 	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }

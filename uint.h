@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <postgres.h>
 #include <fmgr.h>
 #include <catalog/catversion.h>
@@ -36,3 +38,6 @@
 #define PG_RETURN_UINT64(x)	return UInt64GetDatum(x)
 
 #define SAMESIGN(a,b)	(((a) < 0) == ((b) < 0))
+
+typedef __int128_t int128_t;
+typedef __uint128_t uint128_t;

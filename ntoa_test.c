@@ -5,6 +5,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <stdint.h>
+
+typedef __int128_t int128_t;
+typedef __uint128_t uint128_t;
 
 #include "ntoa.h"
 

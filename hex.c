@@ -36,3 +36,30 @@ extern int no_such_variable
 
 make_to_hex(uint4, UINT32);
 make_to_hex(uint8, UINT64);
+
+static text*
+_to_hex16(uint128_t value)
+{
+	char	   *ptr;
+	const char *digits = "0123456789abcdef";
+	char		buf[40];		/* bigger than needed, but reasonable */
+
+	ptr = buf + sizeof(buf) - 1;
+	*ptr = '\0';
+
+	do
+	{
+		*--ptr = digits[value % HEXBASE];
+		value /= HEXBASE;
+	} while (ptr > buf && value);
+
+	return cstring_to_text(ptr);
+}
+
+PG_FUNCTION_INFO_V1(to_hex_uint16);
+Datum
+to_hex_uint16(PG_FUNCTION_ARGS)
+{
+	uint128_t	arg = *(uint128_t *)PG_GETARG_POINTER(0);
+	PG_RETURN_TEXT_P(_to_hex16(arg));
+}

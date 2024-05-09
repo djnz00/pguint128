@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 /*
  * Faster ntoa than sprintf("%u")
  * - use count leading zeroes (CLZ) intrinsic to determine log2 of value;
@@ -183,8 +181,8 @@ utoa32(char *buf, uint32_t v)
 	do { buf[--n] = (v % 10) + '0'; v /= 10; } while (likely(n));
 }
 
-static void
-utoa64(char *buf, uint64_t v)
+static unsigned int
+log10_64(uint64_t v)
 {
 	static uint8_t clz10[] = {
 		39, 38, 38, 38, 37, 36, 36, 35, 34, 34,
@@ -195,7 +193,7 @@ utoa64(char *buf, uint64_t v)
 		 9,  8,  8,  8,  7,  6,  6,  5,  4,  4,
 		 3,  2,  2,  2
 	};
-	unsigned n;
+	unsigned int n;
 	if (unlikely(!v))
 		n = 1;
 	else {
@@ -207,6 +205,43 @@ utoa64(char *buf, uint64_t v)
 			n = o + (v >= pow10_64(o));
 		}
 	}
+	return n;
+}
+
+static void
+utoa64(char *buf, uint64_t v)
+{
+	unsigned n = log10_64(v);
 	buf[n] = 0;
 	do { buf[--n] = (v % 10) + '0'; v /= 10; } while (likely(n));
+}
+
+static unsigned int
+log10_128(uint128_t v)
+{
+     uint128_t f = (uint128_t)10000000000000000000ULL;
+     unsigned int n;
+	 if (likely(v < f))
+		 n = log10_64(v);
+     else
+		 n = log10_64(v / f) + 19;
+	return n;
+}
+
+static void
+utoa128(char *buf, uint128_t v)
+{
+	unsigned n = log10_128(v);
+	buf[n] = 0;
+	do { buf[--n] = (v % 10) + '0'; v /= 10; } while (likely(n));
+}
+
+static void
+itoa128(char *buf, int128_t v)
+{
+	if (v < 0) {
+		*buf++ = '-';
+		v = -v;
+	}
+	utoa128(buf, v);
 }

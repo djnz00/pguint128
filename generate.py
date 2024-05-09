@@ -2,7 +2,7 @@ import re
 import sys
 
 
-new_types = ['int1', 'uint1', 'uint2', 'uint4', 'uint8']
+new_types = ['int1', 'uint1', 'uint2', 'uint4', 'uint8', 'int16', 'uint16']
 old_types = ['int2', 'int4', 'int8']
 
 comparison_ops = ['<', '<=', '=', '<>', '>=', '>']
@@ -63,10 +63,12 @@ c_types = {
     'int2': 'int16',
     'int4': 'int32',
     'int8': 'int64',
+    'int16': 'int128_t',
     'uint1': 'uint8',
     'uint2': 'uint16',
     'uint4': 'uint32',
     'uint8': 'uint64',
+    'uint16': 'uint128_t'
 }
 
 
@@ -94,8 +96,13 @@ def type_unsigned(typ):
     return typ.startswith('u')
 
 
+def type_large(typ):
+    return typ.endswith('16')
+
+
 min_values = {
     'int1': '-128',
+    'int16': '-170141183460469231731687303715884105728'
 }
 
 max_values = {
@@ -103,10 +110,12 @@ max_values = {
     'int2': '32767',
     'int4': '2147483647',
     'int8': '9223372036854775807',
+    'int16': '170141183460469231731687303715884105727',
     'uint1': '255',
     'uint2': '65535',
     'uint4': '4294967295',
     'uint8': '18446744073709551615',
+    'uint16': '340282366920938463463374607431768211455'
 }
 
 too_big = {
@@ -114,10 +123,12 @@ too_big = {
     'int2': '40000',
     'int4': '3000000000',
     'int8': '10000000000000000000',
+    'int16': '200000000000000000000000000000000000000',
     'uint1': '300',
     'uint2': '70000',
     'uint4': '5000000000',
     'uint8': '20000000000000000000',
+    'uint16': '500000000000000000000000000000000000000'
 }
 
 
@@ -139,17 +150,35 @@ Datum
         argvar += 1
         if argtype is None:
             continue
-        f.write("\t{0} arg{1} = PG_GETARG_{2}({3});\n"
-                .format(c_types[argtype],
-                        argvar,
-                        c_types[argtype].upper(),
-                        argnum))
+        if type_large(argtype):
+            f.write("\t{0} arg{1} = *({0} *)PG_GETARG_POINTER({2});\n"
+                    .format(c_types[argtype],
+                            argvar,
+                            argnum))
+        else:
+            f.write("\t{0} arg{1} = PG_GETARG_{2}({3});\n"
+                    .format(c_types[argtype],
+                            argvar,
+                            c_types[argtype].upper(),
+                            argnum))
         argnum += 1
-    f.write("\t{0} result;\n".format(c_types[rettype]))
+    if type_large(rettype):
+        f.write("\t{0} *result = ({0} *)palloc(sizeof({0}));\n"
+                .format(c_types[rettype]))
+        body = body.replace("result", "(*result)")
+        body = body.replace("PG_RETURN_{0}(0)".format(c_types[rettype].upper()), "{ *result = 0; PG_RETURN_POINTER(result); }")
+    else:
+        f.write("\t{0} result;\n".format(c_types[rettype]))
     f.write("\n")
     f.write("\t" + body.replace("\n", "\n\t").replace("\n\t\n", "\n\n"))
     f.write("\n")
-    f.write("""
+    if type_large(rettype):
+        f.write("""
+\tPG_RETURN_POINTER(result);
+}}
+""".format())
+    else:
+        f.write("""
 \tPG_RETURN_{0}(result);
 }}
 """.format(c_types[rettype].upper()))
@@ -170,7 +199,7 @@ def write_sql_function(f, funcname, argtypes, rettype, sql_funcname=None, strict
 def write_op_c_function(f, funcname, leftarg, rightarg, op, rettype, c_check='', intermediate_type=None):
     body = ""
     if intermediate_type:
-        body += "{0} result2;\n\n".format(c_types[intermediate_type])
+        body += "{0} intermediate;\n\n".format(c_types[intermediate_type])
     if op in ['/', '%']:
         body += """if (arg2 == 0)
 {
@@ -187,7 +216,7 @@ def write_op_c_function(f, funcname, leftarg, rightarg, op, rettype, c_check='',
 
 """.format(c_types[rettype].upper())
     if intermediate_type:
-        body += "result2 = "
+        body += "intermediate = "
     else:
         body += "result = "
     if leftarg:
@@ -208,7 +237,7 @@ if ({0})
 \t\t(errcode(ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE),
 \t\t errmsg("integer out of range")));""".format(c_check)
     if intermediate_type:
-        body += "\nresult = result2;"
+        body += "\nresult = intermediate;"
 
     write_c_function(f, funcname, [leftarg, rightarg], rettype, body)
 
@@ -257,19 +286,36 @@ def write_cmp_sql_function(f, leftarg, rightarg):
 
 def write_sortsupport_c_function(f, typ, pgversion):
     if pgversion >= 9.2:
-        f.write("""
+        if type_large(typ):
+            f.write("""
+static int
+bt{typ}fastcmp(Datum x, Datum y, SortSupport ssup)
+{{
+\t{ctype} a = *({Ctype} *)DatumGetPointer(x);
+\t{ctype} b = *({Ctype} *)DatumGetPointer(y);
+
+\treturn (a > b) - (a < b);
+}}
+
+PG_FUNCTION_INFO_V1(bt{typ}sortsupport);
+Datum
+bt{typ}sortsupport(PG_FUNCTION_ARGS)
+{{
+\tSortSupport ssup = (SortSupport) PG_GETARG_POINTER(0);
+
+\tssup->comparator = bt{typ}fastcmp;
+\tPG_RETURN_VOID();
+}}
+""".format(typ=typ, ctype=c_types[typ], Ctype=c_types[typ]))
+        else:
+            f.write("""
 static int
 bt{typ}fastcmp(Datum x, Datum y, SortSupport ssup)
 {{
 \t{ctype} a = DatumGet{Ctype}(x);
 \t{ctype} b = DatumGet{Ctype}(y);
 
-\tif (a > b)
-\t\treturn 1;
-\telse if (a == b)
-\t\treturn 0;
-\telse
-\t\treturn -1;
+\treturn (a > b) - (a < b);
 }}
 
 PG_FUNCTION_INFO_V1(bt{typ}sortsupport);
@@ -322,6 +368,8 @@ sum_trans_types = {
     'uint2': 'uint8',
     'uint4': 'uint8',
     'uint8': 'uint8',
+    'int16': 'int16',
+    'uint16': 'uint16'
 }
 
 avg_trans_types = {
@@ -329,9 +377,20 @@ avg_trans_types = {
     'uint1': '_int8',
     'uint2': '_int8',
     'uint4': '_int8',
-    'uint8': '_int8',
+    'uint8': 'uint8[]',
+    'int16': 'int16[]',
+    'uint16': 'uint16[]'
 }
 
+avg_final_funcs = {
+    'int1': 'int8_avg',
+    'uint1': 'int8_avg',
+    'uint2': 'int8_avg',
+    'uint4': 'int8_avg',
+    'uint8': 'uint8_avg',
+    'int16': 'int16_avg',
+    'uint16': 'uint16_avg'
+}
 
 def write_arithmetic_op(f_c, f_sql, f_test_sql, op, leftarg, rightarg):
     args = sorted([leftarg, rightarg], key=lambda x: (type_bits(x), type_unsigned(x)))
@@ -381,7 +440,7 @@ def write_arithmetic_op(f_c, f_sql, f_test_sql, op, leftarg, rightarg):
     if op == '*':
         if type_bits(rettype) < 64:
             intermediate_type = next_bigger_type(rettype)
-            c_check = '({0}) result2 != result2'.format(c_types[rettype])
+            c_check = '({0}) intermediate != intermediate'.format(c_types[rettype])
         elif type_unsigned(rettype):
             if type_unsigned(leftarg) and type_signed(rightarg):
                 c_check = '(arg2 < 0) || ('
@@ -612,9 +671,9 @@ SELECT sum(val::{argtype}) FROM (VALUES (1), (null), (2), (5)) _ (val);
         sfunc = "{argtype}_avg_accum".format(argtype=arg)
         stype = avg_trans_types[arg]
         write_sql_function(f_sql, sfunc, [stype, arg], stype)
-        f_sql.write("CREATE AGGREGATE avg({arg}) (SFUNC = {sfunc}, STYPE = {stype}, FINALFUNC = int8_avg,"
+        f_sql.write("CREATE AGGREGATE avg({arg}) (SFUNC = {sfunc}, STYPE = {stype}, FINALFUNC = {finalfunc},"
                     " INITCOND = '{{0,0}}');\n\n"
-                    .format(arg=arg, sfunc=sfunc, stype=stype))
+                    .format(arg=arg, sfunc=sfunc, stype=stype, finalfunc=avg_final_funcs[arg]))
         f_test_sql.write("""
 SELECT avg(val::{argtype}) FROM (SELECT NULL::{argtype} WHERE false) _ (val);
 SELECT avg(val::{argtype}) FROM (VALUES (1), (null), (2), (5), (6)) _ (val);
