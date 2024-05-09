@@ -271,13 +271,7 @@ def write_sql_operator(f, funcname, leftarg, rightarg, op, rettype):
 def write_cmp_c_function(f, leftarg, rightarg):
     funcname = 'bt' + coalesce(leftarg, '') + coalesce(rightarg, '') + 'cmp'
     write_c_function(f, funcname, [leftarg, rightarg], 'int4',
-                     """if (arg1 > arg2)
-\tresult = 1;
-else if (arg1 == arg2)
-\tresult = 0;
-else
-\tresult = -1;""")
-
+                     "result = (arg1 > arg2) - (arg1 < arg2);")
 
 def write_cmp_sql_function(f, leftarg, rightarg):
     funcname = 'bt' + coalesce(leftarg, '') + coalesce(rightarg, '') + 'cmp'
