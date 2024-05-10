@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include <postgres.h>
 #include <fmgr.h>
 #include <catalog/catversion.h>

@@ -1,12 +1,13 @@
 #include <postgres.h>
 #include <fmgr.h>
+#include <libpq/pqformat.h>
 #include <utils/builtins.h>
 
 #include "uint.h"
+#include "ntoa.h"
 
-#include <inttypes.h>
+/* #include <inttypes.h> */
 #include <limits.h>
-
 
 /*
  * Copy of old pg_atoi() from PostgreSQL, cut down to support int8 only.
@@ -76,8 +77,30 @@ int1out(PG_FUNCTION_ARGS)
 	int8		arg1 = PG_GETARG_INT8(0);
 	char	   *result = palloc(5);		/* sign, 3 digits, '\0' */
 
-	sprintf(result, "%d", arg1);
+	itoa8(result, arg1);
+	/* sprintf(result, "%d", arg1); */
 	PG_RETURN_CSTRING(result);
+}
+
+PG_FUNCTION_INFO_V1(int1recv);
+Datum
+int1recv(PG_FUNCTION_ARGS)
+{
+	StringInfo	buf = (StringInfo)PG_GETARG_POINTER(0);
+
+	PG_RETURN_INT8((int8) pq_getmsgint(buf, sizeof(int8)));
+}
+
+PG_FUNCTION_INFO_V1(int1send);
+Datum
+int1send(PG_FUNCTION_ARGS)
+{
+	int8		arg1 = PG_GETARG_INT8(0);
+	StringInfoData buf;
+
+	pq_begintypsend(&buf);
+	pq_sendint8(&buf, arg1);
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }
 
 static uint32
@@ -159,8 +182,30 @@ uint1out(PG_FUNCTION_ARGS)
 	uint8		arg1 = PG_GETARG_UINT8(0);
 	char	   *result = palloc(4);		/* 3 digits, '\0' */
 
-	sprintf(result, "%u", arg1);
+	utoa8(result, arg1);
+	/* sprintf(result, "%u", arg1); */
 	PG_RETURN_CSTRING(result);
+}
+
+PG_FUNCTION_INFO_V1(uint1recv);
+Datum
+uint1recv(PG_FUNCTION_ARGS)
+{
+	StringInfo	buf = (StringInfo)PG_GETARG_POINTER(0);
+
+	PG_RETURN_UINT8((uint8) pq_getmsgint(buf, sizeof(uint8)));
+}
+
+PG_FUNCTION_INFO_V1(uint1send);
+Datum
+uint1send(PG_FUNCTION_ARGS)
+{
+	uint8		arg1 = PG_GETARG_UINT8(0);
+	StringInfoData buf;
+
+	pq_begintypsend(&buf);
+	pq_sendint8(&buf, arg1);
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }
 
 PG_FUNCTION_INFO_V1(uint2in);
@@ -179,8 +224,30 @@ uint2out(PG_FUNCTION_ARGS)
 	uint16		arg1 = PG_GETARG_UINT16(0);
 	char	   *result = palloc(6);		/* 5 digits, '\0' */
 
-	sprintf(result, "%u", arg1);
+	utoa32(result, arg1);
+	/* sprintf(result, "%u", arg1); */
 	PG_RETURN_CSTRING(result);
+}
+
+PG_FUNCTION_INFO_V1(uint2recv);
+Datum
+uint2recv(PG_FUNCTION_ARGS)
+{
+	StringInfo	buf = (StringInfo)PG_GETARG_POINTER(0);
+
+	PG_RETURN_UINT16((uint16) pq_getmsgint(buf, sizeof(uint16)));
+}
+
+PG_FUNCTION_INFO_V1(uint2send);
+Datum
+uint2send(PG_FUNCTION_ARGS)
+{
+	uint8		arg1 = PG_GETARG_UINT16(0);
+	StringInfoData buf;
+
+	pq_begintypsend(&buf);
+	pq_sendint16(&buf, arg1);
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }
 
 PG_FUNCTION_INFO_V1(uint4in);
@@ -199,8 +266,30 @@ uint4out(PG_FUNCTION_ARGS)
 	uint32		arg1 = PG_GETARG_UINT32(0);
 	char	   *result = palloc(11);	/* 10 digits, '\0' */
 
-	sprintf(result, "%u", arg1);
+	utoa32(result, arg1);
+	/* sprintf(result, "%u", arg1); */
 	PG_RETURN_CSTRING(result);
+}
+
+PG_FUNCTION_INFO_V1(uint4recv);
+Datum
+uint4recv(PG_FUNCTION_ARGS)
+{
+	StringInfo	buf = (StringInfo)PG_GETARG_POINTER(0);
+
+	PG_RETURN_UINT32((uint32) pq_getmsgint(buf, sizeof(uint32)));
+}
+
+PG_FUNCTION_INFO_V1(uint4send);
+Datum
+uint4send(PG_FUNCTION_ARGS)
+{
+	uint8		arg1 = PG_GETARG_UINT32(0);
+	StringInfoData buf;
+
+	pq_begintypsend(&buf);
+	pq_sendint32(&buf, arg1);
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }
 
 PG_FUNCTION_INFO_V1(uint8in);
@@ -252,6 +341,28 @@ uint8out(PG_FUNCTION_ARGS)
 	uint64		arg1 = PG_GETARG_UINT64(0);
 	char	   *result = palloc(21);	/* 20 digits, '\0' */
 
-	sprintf(result, "%"PRIu64, (uint64_t) arg1);
+	utoa64(result, arg1);
+	/* sprintf(result, "%"PRIu64, (uint64_t) arg1); */
 	PG_RETURN_CSTRING(result);
+}
+
+PG_FUNCTION_INFO_V1(uint8recv);
+Datum
+uint8recv(PG_FUNCTION_ARGS)
+{
+	StringInfo	buf = (StringInfo)PG_GETARG_POINTER(0);
+
+	PG_RETURN_UINT64((uint64) pq_getmsgint64(buf));
+}
+
+PG_FUNCTION_INFO_V1(uint8send);
+Datum
+uint8send(PG_FUNCTION_ARGS)
+{
+	uint8		arg1 = PG_GETARG_UINT64(0);
+	StringInfoData buf;
+
+	pq_begintypsend(&buf);
+	pq_sendint64(&buf, arg1);
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }
