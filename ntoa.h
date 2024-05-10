@@ -147,11 +147,12 @@ utoa8(char *buf, uint8_t v)
 }
 
 static void
-itoa8(char *buf, int8_t v)
+itoa8(char *buf, int8_t v_)
 {
-	if (v < 0) {
+	uint8_t v = v_;
+	if (v_ < 0) {
 		*buf++ = '-';
-		v = -v;
+		v = ~v + 1;
 	}
 	utoa8(buf, v);
 }
