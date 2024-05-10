@@ -60,6 +60,52 @@ make_avg_func(uint1, UINT8);
 make_avg_func(uint2, UINT16);
 make_avg_func(uint4, UINT32);
 
+PG_FUNCTION_INFO_V1(int16_sum);
+Datum
+int16_sum(PG_FUNCTION_ARGS)
+{
+	if (unlikely(PG_ARGISNULL(0))) {
+		if (unlikely(PG_ARGISNULL(1))) PG_RETURN_NULL();
+		PG_RETURN_POINTER(PG_GETARG_POINTER(1));
+	}
+	if (unlikely(PG_ARGISNULL(1))) PG_RETURN_POINTER(PG_GETARG_POINTER(0));
+	{
+		int128_t *l = (int128_t *)PG_GETARG_POINTER(0);
+		int128_t r = *(int128_t *)PG_GETARG_POINTER(1);
+		if (AggCheckCallContext(fcinfo, NULL)) {
+		  *l += r;
+		  PG_RETURN_POINTER(l);
+		} else {
+		  int128_t *v = (int128_t *)palloc(sizeof(int128_t));
+		  *v = *l + r;
+		  PG_RETURN_POINTER(v);
+		}
+	}
+}
+
+PG_FUNCTION_INFO_V1(uint16_sum);
+Datum
+uint16_sum(PG_FUNCTION_ARGS)
+{
+	if (unlikely(PG_ARGISNULL(0))) {
+		if (unlikely(PG_ARGISNULL(1))) PG_RETURN_NULL();
+		PG_RETURN_POINTER(PG_GETARG_POINTER(1));
+	}
+	if (unlikely(PG_ARGISNULL(1))) PG_RETURN_POINTER(PG_GETARG_POINTER(0));
+	{
+		uint128_t *l = (uint128_t *)PG_GETARG_POINTER(0);
+		uint128_t r = *(uint128_t *)PG_GETARG_POINTER(1);
+		if (AggCheckCallContext(fcinfo, NULL)) {
+		  *l += r;
+		  PG_RETURN_POINTER(l);
+		} else {
+		  uint128_t *v = (uint128_t *)palloc(sizeof(uint128_t));
+		  *v = *l + r;
+		  PG_RETURN_POINTER(v);
+		}
+	}
+}
+
 /* missing */
 #ifndef PG_GETARG_UINT64
 #define PG_GETARG_UINT64(n)  DatumGetUInt64(PG_GETARG_DATUM(n))

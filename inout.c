@@ -413,7 +413,7 @@ int16in(PG_FUNCTION_ARGS)
 		ereport(
 			ERROR,
 			(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
-			 errmsg("invalid input syntax for int128: \"%s\"", s)));
+			 errmsg("invalid input syntax for type int16: \"%s\"", s)));
 
 	PG_RETURN_POINTER(v);
 }
@@ -431,6 +431,26 @@ int16out(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(uint16in);
 Datum
 uint16in(PG_FUNCTION_ARGS)
+{
+	uint128_t *v = (uint128_t *)palloc(sizeof(uint128_t));
+	const char *s = PG_GETARG_CSTRING(0);
+	unsigned int n = atou128(s, v);
+
+	/* SQL requires trailing spaces to be ignored while erroring out on other
+	 * "trailing junk" */
+	if (likely(n)) while (unlikely(isspace(s[n]))) ++n;
+	if (!n || s[n])
+		ereport(
+			ERROR,
+			(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+			 errmsg("invalid input syntax for type uint16: \"%s\"", s)));
+
+	PG_RETURN_POINTER(v);
+}
+
+PG_FUNCTION_INFO_V1(uint16out);
+Datum
+uint16out(PG_FUNCTION_ARGS)
 {
 	uint128_t		arg1 = *(uint128_t *)PG_GETARG_POINTER(0);
 	char			*result = palloc(40);	/* 39 digits, '\0' */
@@ -456,6 +476,32 @@ pg_bswap128(uint128_t i)
 #endif /* __GNUC__ && !__llvm__ */
 #endif /* WORDS_BIGENDIAN */
 #endif /* pg_bswap128 */
+
+PG_FUNCTION_INFO_V1(int16recv);
+Datum
+int16recv(PG_FUNCTION_ARGS)
+{
+	StringInfo buf = (StringInfo)PG_GETARG_POINTER(0);
+	int128_t *v = (int128_t *)palloc(sizeof(int128_t));
+	pq_copymsgbytes(buf, (char *)v, 16);
+	*v = (int128_t)pg_bswap128(*v);
+	PG_RETURN_POINTER(v);
+}
+
+PG_FUNCTION_INFO_V1(int16send);
+Datum
+int16send(PG_FUNCTION_ARGS)
+{
+	int128_t value = *(int128_t *)PG_GETARG_POINTER(0);
+	StringInfoData buf;
+	pq_begintypsend(&buf);
+	enlargeStringInfo(&buf, 16);
+	Assert(buf.len + 16 <= buf.maxlen);
+        value = (int128_t)pg_bswap128(value);
+	memcpy((char *)(buf.data + buf.len), &value, 16);
+	buf.len += 16;
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
+}
 
 PG_FUNCTION_INFO_V1(uint16recv);
 Datum

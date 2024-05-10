@@ -237,25 +237,23 @@ CREATE FUNCTION int16out(int16) RETURNS cstring
     LANGUAGE C
     AS '$libdir/uint', 'int16out';
 
--- re-use uint16recv and uint16send for int16
-
-CREATE FUNCTION uint16recv(internal) RETURNS uint16
+CREATE FUNCTION int16recv(internal) RETURNS int16
     IMMUTABLE
     STRICT
     LANGUAGE C
-    AS '$libdir/uint', 'uint16recv';
+    AS '$libdir/uint', 'int16recv';
 
-CREATE FUNCTION uint16send(uint16) RETURNS bytea
+CREATE FUNCTION int16send(int16) RETURNS bytea
     IMMUTABLE
     STRICT
     LANGUAGE C
-    AS '$libdir/uint', 'uint16send';
+    AS '$libdir/uint', 'int16send';
 
 CREATE TYPE int16 (
     INPUT = int16in,
     OUTPUT = int16out,
-    RECEIVE = uint16recv,
-    SEND = uint16send,
+    RECEIVE = int16recv,
+    SEND = int16send,
     INTERNALLENGTH = 16,
     ALIGNMENT = char
 );
@@ -283,6 +281,18 @@ CREATE FUNCTION uint16out(uint16) RETURNS cstring
     LANGUAGE C
     AS '$libdir/uint', 'uint16out';
 
+CREATE FUNCTION uint16recv(internal) RETURNS uint16
+    IMMUTABLE
+    STRICT
+    LANGUAGE C
+    AS '$libdir/uint', 'uint16recv';
+
+CREATE FUNCTION uint16send(uint16) RETURNS bytea
+    IMMUTABLE
+    STRICT
+    LANGUAGE C
+    AS '$libdir/uint', 'uint16send';
+
 CREATE TYPE uint16 (
     INPUT = uint16in,
     OUTPUT = uint16out,
@@ -301,15 +311,18 @@ CREATE CAST (uint16 AS numeric) WITH INOUT AS IMPLICIT;
 CREATE CAST (uint16 AS real) WITH INOUT AS IMPLICIT;
 
 
-CREATE FUNCTION int1um(int1) RETURNS int1 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'int1um';
+CREATE FUNCTION int1um(int1) RETURNS int1
+    IMMUTABLE STRICT LANGUAGE C
+    AS '$libdir/uint', 'int1um';
 
 CREATE OPERATOR - (
    PROCEDURE = int1um,
    RIGHTARG = int1
 );
 
-
-CREATE FUNCTION int16um(int16) RETURNS int16 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'int16um';
+CREATE FUNCTION int16um(int16) RETURNS int16
+    IMMUTABLE STRICT LANGUAGE C
+    AS '$libdir/uint', 'int16um';
 
 CREATE OPERATOR - (
    PROCEDURE = int16um,
@@ -317,8 +330,14 @@ CREATE OPERATOR - (
 );
 
 
-CREATE FUNCTION uint8_avg(uint8[]) RETURNS uint8 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'uint8_avg';
+CREATE FUNCTION uint8_avg(uint8[]) RETURNS uint8
+    IMMUTABLE STRICT LANGUAGE C
+    AS '$libdir/uint', 'uint8_avg';
 
-CREATE FUNCTION int16_avg(int16[]) RETURNS int16 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'int16_avg';
+CREATE FUNCTION int16_avg(int16[]) RETURNS int16
+    IMMUTABLE STRICT LANGUAGE C
+    AS '$libdir/uint', 'int16_avg';
 
-CREATE FUNCTION uint16_avg(uint16[]) RETURNS uint16 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'uint16_avg';
+CREATE FUNCTION uint16_avg(uint16[]) RETURNS uint16
+    IMMUTABLE STRICT LANGUAGE C
+    AS '$libdir/uint', 'uint16_avg';

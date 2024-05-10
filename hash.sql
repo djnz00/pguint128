@@ -3,5 +3,5 @@ CREATE FUNCTION hashuint1(uint1) RETURNS int4 IMMUTABLE STRICT LANGUAGE C AS '$l
 CREATE FUNCTION hashuint2(uint2) RETURNS int4 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'hashuint2';
 CREATE FUNCTION hashuint4(uint4) RETURNS int4 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'hashuint4';
 CREATE FUNCTION hashuint8(uint8) RETURNS int4 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'hashuint8';
-CREATE FUNCTION hashint16(int16) RETURNS int4 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'hashuint16';
+CREATE FUNCTION hashint16(int16) RETURNS int4 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'hashint16';
 CREATE FUNCTION hashuint16(uint16) RETURNS int4 IMMUTABLE STRICT LANGUAGE C AS '$libdir/uint', 'hashuint16';
