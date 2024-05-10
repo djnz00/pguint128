@@ -38,10 +38,10 @@ python-check: generate.py
 	pylint $^
 
 ntoa_test.o: ntoa_test.c
-	$(CC) $^ -c -O3 -g
+	$(CC) -O3 -g -c ntoa_test.c
 
 ntoa_test: ntoa_test.o
-	$(CC) $^ -O3 -g -o $@
+	$(CC) -O3 -g $^ -o $@
 
 ntoa-check: ntoa_test
 	./ntoa_test

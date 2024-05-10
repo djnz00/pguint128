@@ -389,17 +389,13 @@ atou128(const char *s, uint128_t *r)
 static unsigned int
 atoi128(const char *s, int128_t *r)
 {
-	unsigned int o;
 	if (s[0] == '-') {
-		o = atou128(&s[1], (uint128_t *)r);
-		if (!o || *r < 0) return 0;
+		unsigned int o = atou128(&s[1], (uint128_t *)r);
+		if (!o) return 0;
 		*r = -*r;
 		return o + 1;
-	} else {
-		o = atou128(s, (uint128_t *)r);
-		if (*r < 0) return 0;
-		return o;
 	}
+	return atou128(s, (uint128_t *)r);
 }
 
 PG_FUNCTION_INFO_V1(int16in);

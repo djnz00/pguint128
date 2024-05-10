@@ -223,8 +223,15 @@ log10_128(uint128_t v)
      unsigned int n;
 	 if (likely(v < f))
 		 n = log10_64(v);
-     else
-		 n = log10_64(v / f) + 19;
+     else {
+	     v /= f;
+		 if (likely(v < f))
+		   n = log10_64(v) + 19;
+		 else {
+		   v /= f;
+		   n = log10_64(v) + 38;
+		 }
+	 }
 	return n;
 }
 

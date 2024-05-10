@@ -5,7 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <inttypes.h>
-#include <stdint.h>
 
 typedef __int128_t int128_t;
 typedef __uint128_t uint128_t;
@@ -92,6 +91,79 @@ testu64()
 	printf("uint64_t final value %s\n", buf);
 }
 
+static unsigned int
+atou128(const char *s, uint128_t *r)
+{
+    int c = s[0];
+	uint128_t v;
+	unsigned int o;
+	if (unlikely(c < '0' || c > '9')) return 0;
+	v = c - '0';
+	o = 1;
+	while (likely(o < 39 && (c = s[o]) >= '0' && c <= '9')) {
+		v = v * 10 + (c - '0');
+		++o;
+	}
+	*r = v;
+	return o;
+}
+
+static unsigned int
+atoi128(const char *s, int128_t *r)
+{
+	if (s[0] == '-') {
+		unsigned int o = atou128(&s[1], (uint128_t *)r);
+		if (!o) return 0;
+		*r = -*r;
+		return o + 1;
+	}
+	return atou128(s, (uint128_t *)r);
+}
+
+/* both gcc and clang have a 128bit wraparound bug, so avoid that below */
+
+void
+testi128()
+{
+	int128_t i;
+	unsigned int n;
+	char buf[48];
+
+	i = ((uint128_t)1)<<127;
+	do {
+		itoa128(buf, i);
+		n = strlen(buf);
+		assert(n > 0 && n <= 40);
+		assert(!i || buf[0] != '0');
+		int128_t j;
+		assert(atoi128(buf, &j) == n);
+		assert(i == j);
+		i += (((int128_t)0x00000100)<<96);
+	} while (i != (((int128_t)0x7fffff00)<<96));
+	printf("int128_t final value %s\n", buf);
+}
+
+void
+testu128()
+{
+	uint128_t i;
+	unsigned int n;
+	char buf[48];
+
+	i = 0;
+	do {
+		utoa128(buf, i);
+		n = strlen(buf);
+		assert(n > 0 && n <= 40);
+		assert(!i || buf[0] != '0');
+		uint128_t j;
+		assert(atou128(buf, &j) == n);
+		assert(i == j);
+		i += (((uint128_t)0x00000100)<<96);
+	} while (i != (((uint128_t)0xffffff00)<<96));
+	printf("uint128_t final value %s\n", buf);
+}
+
 int
 main()
 {
@@ -99,6 +171,8 @@ main()
 	testu8();
 	testu32();
 	testu64();
+	testi128();
+	testu128();
 	puts("all tests passed");
 	return 0;
 }
