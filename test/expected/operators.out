@@ -285,6 +285,134 @@ SELECT a FROM test_uint8 ORDER BY a;
 (5 rows)
 
 DROP TABLE test_uint8;
+SELECT '55'::int16;
+ int16 
+-------
+ 55
+(1 row)
+
+SELECT '-55'::int16;
+ int16 
+-------
+ -55
+(1 row)
+
+SELECT ''::int16;
+ERROR:  invalid input syntax for type int16: ""
+LINE 1: SELECT ''::int16;
+               ^
+SELECT 'x'::int16;
+ERROR:  invalid input syntax for type int16: "x"
+LINE 1: SELECT 'x'::int16;
+               ^
+SELECT '55 x'::int16;
+ERROR:  invalid input syntax for type int16: "55 x"
+LINE 1: SELECT '55 x'::int16;
+               ^
+SELECT '170141183460469231731687303715884105727'::int16;
+                  int16                  
+-----------------------------------------
+ 170141183460469231731687303715884105727
+(1 row)
+
+SELECT '200000000000000000000000000000000000000'::int16;
+                  int16                   
+------------------------------------------
+ -140282366920938463463374607431768211456
+(1 row)
+
+SELECT '-170141183460469231731687303715884105728'::int16;
+                  int16                   
+------------------------------------------
+ -170141183460469231731687303715884105728
+(1 row)
+
+SELECT '-200000000000000000000000000000000000000'::int16;
+                  int16                  
+-----------------------------------------
+ 140282366920938463463374607431768211456
+(1 row)
+
+CREATE TABLE test_int16 (a int16);
+INSERT INTO test_int16 VALUES (-2), (-1), (0), (1), (2);
+SELECT a FROM test_int16;
+ a  
+----
+ -2
+ -1
+ 0
+ 1
+ 2
+(5 rows)
+
+SELECT a FROM test_int16 ORDER BY a;
+ a  
+----
+ -2
+ -1
+ 0
+ 1
+ 2
+(5 rows)
+
+DROP TABLE test_int16;
+SELECT '55'::uint16;
+ uint16 
+--------
+ 55
+(1 row)
+
+SELECT '-55'::uint16;
+ERROR:  invalid input syntax for type uint16: "-55"
+LINE 1: SELECT '-55'::uint16;
+               ^
+SELECT ''::uint16;
+ERROR:  invalid input syntax for type uint16: ""
+LINE 1: SELECT ''::uint16;
+               ^
+SELECT 'x'::uint16;
+ERROR:  invalid input syntax for type uint16: "x"
+LINE 1: SELECT 'x'::uint16;
+               ^
+SELECT '55 x'::uint16;
+ERROR:  invalid input syntax for type uint16: "55 x"
+LINE 1: SELECT '55 x'::uint16;
+               ^
+SELECT '340282366920938463463374607431768211455'::uint16;
+                 uint16                  
+-----------------------------------------
+ 340282366920938463463374607431768211455
+(1 row)
+
+SELECT '500000000000000000000000000000000000000'::uint16;
+                 uint16                  
+-----------------------------------------
+ 159717633079061536536625392568231788544
+(1 row)
+
+CREATE TABLE test_uint16 (a uint16);
+INSERT INTO test_uint16 VALUES (1), (2), (3), (4), (5);
+SELECT a FROM test_uint16;
+ a 
+---
+ 1
+ 2
+ 3
+ 4
+ 5
+(5 rows)
+
+SELECT a FROM test_uint16 ORDER BY a;
+ a 
+---
+ 1
+ 2
+ 3
+ 4
+ 5
+(5 rows)
+
+DROP TABLE test_uint16;
 SELECT '2'::int1 < 5;
  ?column? 
 ----------
@@ -2081,6 +2209,686 @@ SELECT CAST('5'::int1 AS uint8);
 
 SELECT CAST('-5'::int1 AS uint8);
 ERROR:  uint8 out of range
+SELECT '1'::int1 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int1 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int1 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int1 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int1 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int1 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int1 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int1 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int1 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int1 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int1 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int1 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int1 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int1 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int1 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int1 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int1 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int1 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint1int16cmp('1'::int1, '1'::int16);
+ btint1int16cmp 
+----------------
+              0
+(1 row)
+
+SELECT btint1int16cmp('5'::int1, '2'::int16);
+ btint1int16cmp 
+----------------
+              1
+(1 row)
+
+SELECT btint1int16cmp('3'::int1, '4'::int16);
+ btint1int16cmp 
+----------------
+             -1
+(1 row)
+
+SELECT pg_typeof('1'::int1 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int1 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int1 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int1 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int1 + '4'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int1 + '2'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int1 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int1 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '127'::int1 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int1 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int1 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int1 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int1 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int1 - '4'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int1 - '2'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int1 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int1 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int1 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int1 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int1 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int1 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int1 * '4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int1 * '2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int1 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int1 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '127'::int1 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int1 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int1 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int1 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int1 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int1 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int1 / '2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int1 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int1 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int1 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int1 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int1 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int1 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int1 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int1 % '4'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int1 % '2'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int1 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int1 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int1 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::int1, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int1 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int1 AS int16);
+ int16 
+-------
+ -5
+(1 row)
+
+SELECT '1'::int1 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int1 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int1 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int1 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int1 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int1 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int1 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int1 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int1 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int1 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int1 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int1 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int1 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int1 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int1 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int1 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int1 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int1 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint1uint16cmp('1'::int1, '1'::uint16);
+ btint1uint16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint1uint16cmp('5'::int1, '2'::uint16);
+ btint1uint16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint1uint16cmp('3'::int1, '4'::uint16);
+ btint1uint16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int1 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int1 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int1 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int1 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int1 + '4'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int1 + '2'::uint16;
+ERROR:  integer out of range
+SELECT '127'::int1 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int1 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int1 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int1 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int1 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int1 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int1 - '2'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int1 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int1 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int1 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int1 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int1 * '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int1 * '2'::uint16;
+ERROR:  integer out of range
+SELECT '127'::int1 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int1 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int1 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int1 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int1 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int1 / '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int1 / '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int1 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int1 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int1 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int1 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int1 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int1 % '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int1 % '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int1 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::int1, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int1 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int1 AS uint16);
+ERROR:  uint16 out of range
 SELECT '1'::int1 < '1'::int2;
  ?column? 
 ----------
@@ -4859,6 +5667,594 @@ SELECT CAST('5'::uint1 AS uint8);
  5
 (1 row)
 
+SELECT '1'::uint1 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint1 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint1 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint1 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint1 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint1 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint1 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint1 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint1 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint1 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint1 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint1 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint1 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint1 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint1 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint1 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint1 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint1 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint1int16cmp('1'::uint1, '1'::int16);
+ btuint1int16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btuint1int16cmp('5'::uint1, '2'::int16);
+ btuint1int16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btuint1int16cmp('3'::uint1, '4'::int16);
+ btuint1int16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::uint1 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint1 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint1 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint1 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint1 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::uint1 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '255'::uint1 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint1 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint1 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint1 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::uint1 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint1 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint1 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint1 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint1 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint1 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint1 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint1 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::uint1 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '255'::uint1 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint1 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint1 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint1 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint1 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint1 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint1 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::uint1 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint1 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint1 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint1 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint1 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint1 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint1 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint1 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::uint1, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint1 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT '1'::uint1 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint1 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint1 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint1 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint1 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint1 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint1 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint1 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint1 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint1 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint1 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint1 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint1 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint1 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint1 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint1 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint1 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint1 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint1uint16cmp('1'::uint1, '1'::uint16);
+ btuint1uint16cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint1uint16cmp('5'::uint1, '2'::uint16);
+ btuint1uint16cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint1uint16cmp('3'::uint1, '4'::uint16);
+ btuint1uint16cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint1 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint1 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint1 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint1 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '255'::uint1 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint1 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint1 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint1 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::uint1 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint1 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint1 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint1 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint1 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '255'::uint1 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint1 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint1 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint1 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint1 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint1 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint1 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint1 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint1 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint1 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint1 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::uint1, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint1 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
 SELECT '1'::uint1 < '1'::int2;
  ?column? 
 ----------
@@ -7441,6 +8837,594 @@ SELECT CAST('5'::uint2 AS uint8);
  5
 (1 row)
 
+SELECT '1'::uint2 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint2 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint2 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint2 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint2 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint2 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint2 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint2 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint2 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint2 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint2 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint2 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint2 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint2 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint2 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint2 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint2 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint2 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint2int16cmp('1'::uint2, '1'::int16);
+ btuint2int16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btuint2int16cmp('5'::uint2, '2'::int16);
+ btuint2int16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btuint2int16cmp('3'::uint2, '4'::int16);
+ btuint2int16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::uint2 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint2 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint2 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint2 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint2 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::uint2 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '65535'::uint2 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint2 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint2 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint2 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::uint2 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint2 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint2 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint2 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint2 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint2 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint2 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint2 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::uint2 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '65535'::uint2 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint2 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint2 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint2 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint2 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint2 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint2 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::uint2 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint2 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint2 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint2 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint2 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint2 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint2 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint2 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::uint2, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint2 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT '1'::uint2 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint2 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint2 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint2 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint2 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint2 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint2 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint2 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint2 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint2 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint2 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint2 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint2 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint2 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint2 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint2 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint2 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint2 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint2uint16cmp('1'::uint2, '1'::uint16);
+ btuint2uint16cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint2uint16cmp('5'::uint2, '2'::uint16);
+ btuint2uint16cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint2uint16cmp('3'::uint2, '4'::uint16);
+ btuint2uint16cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint2 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint2 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint2 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint2 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '65535'::uint2 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint2 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint2 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint2 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::uint2 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint2 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint2 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint2 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint2 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '65535'::uint2 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint2 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint2 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint2 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint2 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint2 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint2 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint2 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint2 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint2 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint2 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::uint2, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint2 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
 SELECT '1'::uint2 < '1'::int2;
  ?column? 
 ----------
@@ -9987,6 +11971,594 @@ SELECT CAST('5'::uint4 AS uint8);
  5
 (1 row)
 
+SELECT '1'::uint4 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint4 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint4 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint4 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint4 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint4 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint4 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint4 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint4 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint4 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint4 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint4 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint4 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint4 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint4 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint4 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint4 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint4 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint4int16cmp('1'::uint4, '1'::int16);
+ btuint4int16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btuint4int16cmp('5'::uint4, '2'::int16);
+ btuint4int16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btuint4int16cmp('3'::uint4, '4'::int16);
+ btuint4int16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::uint4 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint4 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint4 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint4 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint4 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::uint4 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '4294967295'::uint4 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint4 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint4 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint4 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::uint4 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint4 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint4 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint4 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint4 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint4 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint4 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint4 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::uint4 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '4294967295'::uint4 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint4 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint4 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint4 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint4 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint4 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint4 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::uint4 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint4 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint4 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint4 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint4 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint4 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint4 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint4 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::uint4, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint4 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT '1'::uint4 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint4 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint4 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint4 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint4 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint4 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint4 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint4 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint4 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint4 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint4 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint4 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint4 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint4 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint4 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint4 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint4 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint4 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint4uint16cmp('1'::uint4, '1'::uint16);
+ btuint4uint16cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint4uint16cmp('5'::uint4, '2'::uint16);
+ btuint4uint16cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint4uint16cmp('3'::uint4, '4'::uint16);
+ btuint4uint16cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint4 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint4 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint4 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint4 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '4294967295'::uint4 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint4 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint4 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint4 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::uint4 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint4 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint4 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint4 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint4 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '4294967295'::uint4 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint4 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint4 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint4 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint4 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint4 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint4 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint4 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint4 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint4 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint4 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::uint4, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint4 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
 SELECT '1'::uint4 < '1'::int2;
  ?column? 
 ----------
@@ -12505,6 +15077,594 @@ SELECT mod('5'::uint8, '2'::uint8);
  1
 (1 row)
 
+SELECT '1'::uint8 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint8 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint8 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint8 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint8 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint8 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint8 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint8 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint8 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint8 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint8 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint8 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint8 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint8 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint8 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint8 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint8 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint8 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint8int16cmp('1'::uint8, '1'::int16);
+ btuint8int16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btuint8int16cmp('5'::uint8, '2'::int16);
+ btuint8int16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btuint8int16cmp('3'::uint8, '4'::int16);
+ btuint8int16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::uint8 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint8 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint8 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint8 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint8 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::uint8 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '18446744073709551615'::uint8 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint8 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint8 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint8 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::uint8 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint8 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint8 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint8 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint8 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint8 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint8 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint8 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::uint8 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '18446744073709551615'::uint8 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint8 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint8 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint8 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint8 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint8 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint8 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::uint8 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint8 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::uint8 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint8 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint8 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint8 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint8 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint8 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::uint8, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint8 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT '1'::uint8 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint8 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint8 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint8 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint8 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint8 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint8 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint8 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint8 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint8 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint8 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint8 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint8 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint8 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint8 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint8 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint8 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint8 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint8uint16cmp('1'::uint8, '1'::uint16);
+ btuint8uint16cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint8uint16cmp('5'::uint8, '2'::uint16);
+ btuint8uint16cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint8uint16cmp('3'::uint8, '4'::uint16);
+ btuint8uint16cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint8 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint8 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint8 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint8 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '18446744073709551615'::uint8 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint8 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint8 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint8 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::uint8 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint8 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint8 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint8 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint8 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '18446744073709551615'::uint8 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint8 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint8 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint8 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint8 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint8 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint8 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint8 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint8 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint8 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint8 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::uint8, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint8 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
 SELECT '1'::uint8 < '1'::int2;
  ?column? 
 ----------
@@ -13392,6 +16552,6890 @@ SELECT CAST('5'::uint8 AS int8);
 (1 row)
 
 SELECT CAST('10000000000000000000'::uint8 AS int8);
+ERROR:  int8 out of range
+SELECT '2'::int16 < 5;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 2 < '5'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 < 2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 5 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '2'::int16 <= 5;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 2 <= '5'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= 2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 5 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '2'::int16 = 5;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 2 = '5'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 = 2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 5 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '2'::int16 <> 5;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 2 <> '5'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <> 2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 5 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '2'::int16 >= 5;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 2 >= '5'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 >= 2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 5 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '2'::int16 > 5;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 2 > '5'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > 2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 5 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '2'::int16 + 5;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT 2 + '5'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + 2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT 5 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '2'::int16 - 5;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT 2 - '5'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '5'::int16 - 2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT 5 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '2'::int16 * 5;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT 2 * '5'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '5'::int16 * 2;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT 5 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '2'::int16 / 5;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT 2 / '5'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / 2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT 5 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '2'::int16 % 5;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT 2 % '5'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::int16 % 2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT 5 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '1'::int16 < '1'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16int1cmp('1'::int16, '1'::int1);
+ btint16int1cmp 
+----------------
+              0
+(1 row)
+
+SELECT btint16int1cmp('5'::int16, '2'::int1);
+ btint16int1cmp 
+----------------
+              1
+(1 row)
+
+SELECT btint16int1cmp('3'::int16, '4'::int1);
+ btint16int1cmp 
+----------------
+             -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::int1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::int1;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::int1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::int1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::int1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::int1;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int16 + '-4'::int1;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 + '-2'::int1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '127'::int1;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::int1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::int1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::int1;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::int1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::int1;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::int1;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int16 - '-4'::int1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 - '-2'::int1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::int1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::int1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::int1;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::int1;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::int1;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::int1;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int16 * '-4'::int1;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int16 * '-2'::int1;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '127'::int1;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::int1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::int1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::int1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::int1;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::int1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::int1;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int16 / '-4'::int1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '-2'::int1;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::int1;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::int1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::int1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::int1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::int1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::int1;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::int1;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int16 % '-4'::int1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '-2'::int1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int16 % '0'::int1;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::int1);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS int1);
+ int1 
+------
+ 5
+(1 row)
+
+SELECT CAST('200'::int16 AS int1);
+ERROR:  int1 out of range
+SELECT CAST('-5'::int16 AS int1);
+ int1 
+------
+ -5
+(1 row)
+
+SELECT CAST('-200'::int16 AS int1);
+ERROR:  int1 out of range
+SELECT '1'::int16 < '1'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16uint1cmp('1'::int16, '1'::uint1);
+ btint16uint1cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint16uint1cmp('5'::int16, '2'::uint1);
+ btint16uint1cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint16uint1cmp('3'::int16, '4'::uint1);
+ btint16uint1cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::uint1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::uint1;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::uint1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::uint1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::uint1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::uint1;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '255'::uint1;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::uint1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::uint1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::uint1;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::uint1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::uint1;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::uint1;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::uint1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::uint1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::uint1;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::uint1;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::uint1;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::uint1;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '255'::uint1;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::uint1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::uint1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::uint1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::uint1;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::uint1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::uint1;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::uint1;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::uint1);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::uint1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::uint1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::uint1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::uint1;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::uint1;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 % '0'::uint1;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::uint1);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS uint1);
+ uint1 
+-------
+ 5
+(1 row)
+
+SELECT CAST('300'::int16 AS uint1);
+ERROR:  uint1 out of range
+SELECT CAST('-5'::int16 AS uint1);
+ERROR:  uint1 out of range
+SELECT '1'::int16 < '1'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16uint2cmp('1'::int16, '1'::uint2);
+ btint16uint2cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint16uint2cmp('5'::int16, '2'::uint2);
+ btint16uint2cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint16uint2cmp('3'::int16, '4'::uint2);
+ btint16uint2cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::uint2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::uint2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::uint2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::uint2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::uint2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::uint2;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '65535'::uint2;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::uint2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::uint2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::uint2;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::uint2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::uint2;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::uint2;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::uint2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::uint2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::uint2;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::uint2;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::uint2;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::uint2;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '65535'::uint2;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::uint2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::uint2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::uint2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::uint2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::uint2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::uint2;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::uint2;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::uint2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::uint2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::uint2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::uint2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::uint2;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::uint2;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 % '0'::uint2;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::uint2);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS uint2);
+ uint2 
+-------
+ 5
+(1 row)
+
+SELECT CAST('70000'::int16 AS uint2);
+ERROR:  uint2 out of range
+SELECT CAST('-5'::int16 AS uint2);
+ERROR:  uint2 out of range
+SELECT '1'::int16 < '1'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16uint4cmp('1'::int16, '1'::uint4);
+ btint16uint4cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint16uint4cmp('5'::int16, '2'::uint4);
+ btint16uint4cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint16uint4cmp('3'::int16, '4'::uint4);
+ btint16uint4cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::uint4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::uint4;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::uint4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::uint4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::uint4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::uint4;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '4294967295'::uint4;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::uint4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::uint4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::uint4;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::uint4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::uint4;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::uint4;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::uint4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::uint4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::uint4;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::uint4;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::uint4;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::uint4;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '4294967295'::uint4;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::uint4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::uint4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::uint4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::uint4;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::uint4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::uint4;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::uint4;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::uint4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::uint4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::uint4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::uint4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::uint4;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::uint4;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 % '0'::uint4;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::uint4);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS uint4);
+ uint4 
+-------
+ 5
+(1 row)
+
+SELECT CAST('5000000000'::int16 AS uint4);
+ERROR:  uint4 out of range
+SELECT CAST('-5'::int16 AS uint4);
+ERROR:  uint4 out of range
+SELECT '1'::int16 < '1'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16uint8cmp('1'::int16, '1'::uint8);
+ btint16uint8cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint16uint8cmp('5'::int16, '2'::uint8);
+ btint16uint8cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint16uint8cmp('3'::int16, '4'::uint8);
+ btint16uint8cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::uint8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::uint8;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::uint8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::uint8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::uint8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::uint8;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '18446744073709551615'::uint8;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::uint8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::uint8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::uint8;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::uint8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::uint8;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::uint8;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::uint8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::uint8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::uint8;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::uint8;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::uint8;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::uint8;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '18446744073709551615'::uint8;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::uint8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::uint8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::uint8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::uint8;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::uint8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::uint8;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::uint8;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::uint8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::uint8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::uint8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::uint8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::uint8;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::uint8;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 % '0'::uint8;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::uint8);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS uint8);
+ uint8 
+-------
+ 5
+(1 row)
+
+SELECT CAST('20000000000000000000'::int16 AS uint8);
+ERROR:  uint8 out of range
+SELECT CAST('-5'::int16 AS uint8);
+ERROR:  uint8 out of range
+SELECT '1'::int16 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16int16cmp('1'::int16, '1'::int16);
+ btint16int16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint16int16cmp('5'::int16, '2'::int16);
+ btint16int16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint16int16cmp('3'::int16, '4'::int16);
+ btint16int16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int16 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int16 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int16 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int16 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int16 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int16 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int16 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT '1'::int16 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16uint16cmp('1'::int16, '1'::uint16);
+ btint16uint16cmp 
+------------------
+                0
+(1 row)
+
+SELECT btint16uint16cmp('5'::int16, '2'::uint16);
+ btint16uint16cmp 
+------------------
+                1
+(1 row)
+
+SELECT btint16uint16cmp('3'::int16, '4'::uint16);
+ btint16uint16cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int16 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::uint16;
+ERROR:  integer out of range
+SELECT '170141183460469231731687303715884105727'::int16 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int16 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int16 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int16 - '2'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int16 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int16 * '2'::uint16;
+ERROR:  integer out of range
+SELECT '170141183460469231731687303715884105727'::int16 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int16 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int16 / '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int16 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int16 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int16 % '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int16 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int16 AS uint16);
+ERROR:  uint16 out of range
+SELECT '1'::int16 < '1'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16int2cmp('1'::int16, '1'::int2);
+ btint16int2cmp 
+----------------
+              0
+(1 row)
+
+SELECT btint16int2cmp('5'::int16, '2'::int2);
+ btint16int2cmp 
+----------------
+              1
+(1 row)
+
+SELECT btint16int2cmp('3'::int16, '4'::int2);
+ btint16int2cmp 
+----------------
+             -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::int2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::int2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::int2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::int2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::int2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::int2;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int16 + '-4'::int2;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 + '-2'::int2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '32767'::int2;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::int2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::int2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::int2;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::int2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::int2;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::int2;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int16 - '-4'::int2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 - '-2'::int2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::int2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::int2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::int2;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::int2;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::int2;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::int2;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int16 * '-4'::int2;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int16 * '-2'::int2;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '32767'::int2;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::int2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::int2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::int2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::int2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::int2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::int2;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int16 / '-4'::int2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '-2'::int2;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::int2;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::int2);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::int2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::int2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::int2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::int2;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::int2;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int16 % '-4'::int2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '-2'::int2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int16 % '0'::int2;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::int2);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS int2);
+ int2 
+------
+    5
+(1 row)
+
+SELECT CAST('40000'::int16 AS int2);
+ERROR:  int2 out of range
+SELECT CAST('-5'::int16 AS int2);
+ int2 
+------
+   -5
+(1 row)
+
+SELECT CAST('-40000'::int16 AS int2);
+ERROR:  int2 out of range
+SELECT '1'::int16 < '1'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16int4cmp('1'::int16, '1'::int4);
+ btint16int4cmp 
+----------------
+              0
+(1 row)
+
+SELECT btint16int4cmp('5'::int16, '2'::int4);
+ btint16int4cmp 
+----------------
+              1
+(1 row)
+
+SELECT btint16int4cmp('3'::int16, '4'::int4);
+ btint16int4cmp 
+----------------
+             -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::int4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::int4;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::int4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::int4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::int4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::int4;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int16 + '-4'::int4;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 + '-2'::int4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '2147483647'::int4;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::int4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::int4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::int4;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::int4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::int4;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::int4;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int16 - '-4'::int4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 - '-2'::int4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::int4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::int4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::int4;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::int4;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::int4;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::int4;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int16 * '-4'::int4;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int16 * '-2'::int4;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '2147483647'::int4;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::int4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::int4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::int4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::int4;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::int4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::int4;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int16 / '-4'::int4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '-2'::int4;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::int4;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::int4);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::int4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::int4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::int4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::int4;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::int4;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int16 % '-4'::int4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '-2'::int4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int16 % '0'::int4;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::int4);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS int4);
+ int4 
+------
+    5
+(1 row)
+
+SELECT CAST('3000000000'::int16 AS int4);
+ERROR:  int4 out of range
+SELECT CAST('-5'::int16 AS int4);
+ int4 
+------
+   -5
+(1 row)
+
+SELECT CAST('-3000000000'::int16 AS int4);
+ERROR:  int4 out of range
+SELECT '1'::int16 < '1'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 < '2'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 < '4'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 <= '1'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 <= '2'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 <= '4'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 = '1'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 = '2'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int16 = '4'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 <> '1'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 <> '2'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 <> '4'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int16 >= '1'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int16 >= '2'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 >= '4'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int16 > '1'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int16 > '2'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int16 > '4'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint16int8cmp('1'::int16, '1'::int8);
+ btint16int8cmp 
+----------------
+              0
+(1 row)
+
+SELECT btint16int8cmp('5'::int16, '2'::int8);
+ btint16int8cmp 
+----------------
+              1
+(1 row)
+
+SELECT btint16int8cmp('3'::int16, '4'::int8);
+ btint16int8cmp 
+----------------
+             -1
+(1 row)
+
+SELECT pg_typeof('1'::int16 + '1'::int8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 + '1'::int8;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int16 + '4'::int8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 + '2'::int8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int16 + '4'::int8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int16 + '2'::int8;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int16 + '-4'::int8;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 + '-2'::int8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 + '9223372036854775807'::int8;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 - '1'::int8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 - '1'::int8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 - '4'::int8;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int16 - '2'::int8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int16 - '4'::int8;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int16 - '2'::int8;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int16 - '-4'::int8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 - '-2'::int8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int16 * '1'::int8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 * '1'::int8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 * '4'::int8;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int16 * '2'::int8;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int16 * '4'::int8;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int16 * '2'::int8;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int16 * '-4'::int8;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int16 * '-2'::int8;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '170141183460469231731687303715884105727'::int16 * '9223372036854775807'::int8;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int16 / '1'::int8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 / '1'::int8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int16 / '4'::int8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '2'::int8;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int16 / '4'::int8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int16 / '2'::int8;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int16 / '-4'::int8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 / '-2'::int8;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int16 / '0'::int8;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int16 % '1'::int8);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int16 % '1'::int8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int16 % '4'::int8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '2'::int8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int16 % '4'::int8;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int16 % '2'::int8;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int16 % '-4'::int8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int16 % '-2'::int8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int16 % '0'::int8;
+ERROR:  division by zero
+SELECT mod('5'::int16, '2'::int8);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int16 AS int8);
+ int8 
+------
+    5
+(1 row)
+
+SELECT CAST('10000000000000000000'::int16 AS int8);
+ERROR:  int8 out of range
+SELECT CAST('-5'::int16 AS int8);
+ int8 
+------
+   -5
+(1 row)
+
+SELECT CAST('-10000000000000000000'::int16 AS int8);
+ERROR:  int8 out of range
+SELECT '2'::uint16 < 5;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 2 < '5'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 < 2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 5 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '2'::uint16 <= 5;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 2 <= '5'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= 2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 5 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '2'::uint16 = 5;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 2 = '5'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 = 2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 5 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '2'::uint16 <> 5;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 2 <> '5'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <> 2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 5 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '2'::uint16 >= 5;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 2 >= '5'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 >= 2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 5 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '2'::uint16 > 5;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT 2 > '5'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > 2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT 5 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '2'::uint16 + 5;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT 2 + '5'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + 2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT 5 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '2'::uint16 - 5;
+ERROR:  integer out of range
+SELECT 2 - '5'::uint16;
+ERROR:  integer out of range
+SELECT '5'::uint16 - 2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT 5 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '2'::uint16 * 5;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT 2 * '5'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '5'::uint16 * 2;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT 5 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '2'::uint16 / 5;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT 2 / '5'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / 2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT 5 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '2'::uint16 % 5;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT 2 % '5'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint16 % 2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT 5 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '1'::uint16 < '1'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::int1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::int1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16int1cmp('1'::uint16, '1'::int1);
+ btuint16int1cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btuint16int1cmp('5'::uint16, '2'::int1);
+ btuint16int1cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btuint16int1cmp('3'::uint16, '4'::int1);
+ btuint16int1cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::int1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::int1;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::int1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::int1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint16 + '-4'::int1;
+ERROR:  integer out of range
+SELECT '5'::uint16 + '-2'::int1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '127'::int1;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::int1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::int1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::int1;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::int1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint16 - '-4'::int1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 - '-2'::int1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::int1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::int1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::int1;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::int1;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint16 * '-4'::int1;
+ERROR:  integer out of range
+SELECT '5'::uint16 * '-2'::int1;
+ERROR:  integer out of range
+SELECT '340282366920938463463374607431768211455'::uint16 * '127'::int1;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::int1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::int1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::int1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::int1;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 / '-4'::int1;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '-2'::int1;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '0'::int1;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::int1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::int1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::int1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::int1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 % '-4'::int1;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '-2'::int1;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '0'::int1;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::int1);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS int1);
+ int1 
+------
+ 5
+(1 row)
+
+SELECT CAST('200'::uint16 AS int1);
+ERROR:  int1 out of range
+SELECT '1'::uint16 < '1'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::uint1;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::uint1;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16uint1cmp('1'::uint16, '1'::uint1);
+ btuint16uint1cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint16uint1cmp('5'::uint16, '2'::uint1);
+ btuint16uint1cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint16uint1cmp('3'::uint16, '4'::uint1);
+ btuint16uint1cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::uint1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::uint1;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::uint1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::uint1;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '255'::uint1;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::uint1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::uint1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::uint1;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::uint1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::uint1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::uint1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::uint1;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::uint1;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 * '255'::uint1;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::uint1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::uint1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::uint1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::uint1;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint16 / '0'::uint1;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::uint1);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::uint1;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::uint1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::uint1;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint16 % '0'::uint1;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::uint1);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS uint1);
+ uint1 
+-------
+ 5
+(1 row)
+
+SELECT CAST('300'::uint16 AS uint1);
+ERROR:  uint1 out of range
+SELECT '1'::uint16 < '1'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::uint2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::uint2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16uint2cmp('1'::uint16, '1'::uint2);
+ btuint16uint2cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint16uint2cmp('5'::uint16, '2'::uint2);
+ btuint16uint2cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint16uint2cmp('3'::uint16, '4'::uint2);
+ btuint16uint2cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::uint2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::uint2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::uint2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::uint2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '65535'::uint2;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::uint2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::uint2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::uint2;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::uint2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::uint2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::uint2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::uint2;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::uint2;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 * '65535'::uint2;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::uint2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::uint2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::uint2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::uint2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint16 / '0'::uint2;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::uint2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::uint2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::uint2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::uint2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint16 % '0'::uint2;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::uint2);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS uint2);
+ uint2 
+-------
+ 5
+(1 row)
+
+SELECT CAST('70000'::uint16 AS uint2);
+ERROR:  uint2 out of range
+SELECT '1'::uint16 < '1'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::uint4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::uint4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16uint4cmp('1'::uint16, '1'::uint4);
+ btuint16uint4cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint16uint4cmp('5'::uint16, '2'::uint4);
+ btuint16uint4cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint16uint4cmp('3'::uint16, '4'::uint4);
+ btuint16uint4cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::uint4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::uint4;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::uint4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::uint4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '4294967295'::uint4;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::uint4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::uint4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::uint4;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::uint4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::uint4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::uint4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::uint4;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::uint4;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 * '4294967295'::uint4;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::uint4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::uint4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::uint4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::uint4;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint16 / '0'::uint4;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::uint4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::uint4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::uint4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::uint4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint16 % '0'::uint4;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::uint4);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS uint4);
+ uint4 
+-------
+ 5
+(1 row)
+
+SELECT CAST('5000000000'::uint16 AS uint4);
+ERROR:  uint4 out of range
+SELECT '1'::uint16 < '1'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::uint8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::uint8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16uint8cmp('1'::uint16, '1'::uint8);
+ btuint16uint8cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint16uint8cmp('5'::uint16, '2'::uint8);
+ btuint16uint8cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint16uint8cmp('3'::uint16, '4'::uint8);
+ btuint16uint8cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::uint8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::uint8;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::uint8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::uint8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '18446744073709551615'::uint8;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::uint8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::uint8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::uint8;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::uint8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::uint8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::uint8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::uint8;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::uint8;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 * '18446744073709551615'::uint8;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::uint8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::uint8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::uint8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::uint8;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint16 / '0'::uint8;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::uint8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::uint8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::uint8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::uint8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint16 % '0'::uint8;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::uint8);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS uint8);
+ uint8 
+-------
+ 5
+(1 row)
+
+SELECT CAST('20000000000000000000'::uint16 AS uint8);
+ERROR:  uint8 out of range
+SELECT '1'::uint16 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16int16cmp('1'::uint16, '1'::int16);
+ btuint16int16cmp 
+------------------
+                0
+(1 row)
+
+SELECT btuint16int16cmp('5'::uint16, '2'::int16);
+ btuint16int16cmp 
+------------------
+                1
+(1 row)
+
+SELECT btuint16int16cmp('3'::uint16, '4'::int16);
+ btuint16int16cmp 
+------------------
+               -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::int16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint16 + '-4'::int16;
+ERROR:  integer out of range
+SELECT '5'::uint16 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::int16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::int16;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint16 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::int16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint16 * '-4'::int16;
+ERROR:  integer out of range
+SELECT '5'::uint16 * '-2'::int16;
+ERROR:  integer out of range
+SELECT '340282366920938463463374607431768211455'::uint16 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::int16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 / '-4'::int16;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '-2'::int16;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::int16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 % '-4'::int16;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '-2'::int16;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT CAST('200000000000000000000000000000000000000'::uint16 AS int16);
+ERROR:  int16 out of range
+SELECT '1'::uint16 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16uint16cmp('1'::uint16, '1'::uint16);
+ btuint16uint16cmp 
+-------------------
+                 0
+(1 row)
+
+SELECT btuint16uint16cmp('5'::uint16, '2'::uint16);
+ btuint16uint16cmp 
+-------------------
+                 1
+(1 row)
+
+SELECT btuint16uint16cmp('3'::uint16, '4'::uint16);
+ btuint16uint16cmp 
+-------------------
+                -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '5'::uint16 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint16 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT '1'::uint16 < '1'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::int2;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::int2;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16int2cmp('1'::uint16, '1'::int2);
+ btuint16int2cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btuint16int2cmp('5'::uint16, '2'::int2);
+ btuint16int2cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btuint16int2cmp('3'::uint16, '4'::int2);
+ btuint16int2cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::int2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::int2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::int2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::int2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint16 + '-4'::int2;
+ERROR:  integer out of range
+SELECT '5'::uint16 + '-2'::int2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '32767'::int2;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::int2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::int2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::int2;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::int2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint16 - '-4'::int2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 - '-2'::int2;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::int2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::int2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::int2;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::int2;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint16 * '-4'::int2;
+ERROR:  integer out of range
+SELECT '5'::uint16 * '-2'::int2;
+ERROR:  integer out of range
+SELECT '340282366920938463463374607431768211455'::uint16 * '32767'::int2;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::int2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::int2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::int2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::int2;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 / '-4'::int2;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '-2'::int2;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '0'::int2;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::int2);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::int2;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::int2;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::int2;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 % '-4'::int2;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '-2'::int2;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '0'::int2;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::int2);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS int2);
+ int2 
+------
+    5
+(1 row)
+
+SELECT CAST('40000'::uint16 AS int2);
+ERROR:  int2 out of range
+SELECT '1'::uint16 < '1'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::int4;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::int4;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16int4cmp('1'::uint16, '1'::int4);
+ btuint16int4cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btuint16int4cmp('5'::uint16, '2'::int4);
+ btuint16int4cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btuint16int4cmp('3'::uint16, '4'::int4);
+ btuint16int4cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::int4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::int4;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::int4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::int4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint16 + '-4'::int4;
+ERROR:  integer out of range
+SELECT '5'::uint16 + '-2'::int4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '2147483647'::int4;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::int4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::int4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::int4;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::int4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint16 - '-4'::int4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 - '-2'::int4;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::int4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::int4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::int4;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::int4;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint16 * '-4'::int4;
+ERROR:  integer out of range
+SELECT '5'::uint16 * '-2'::int4;
+ERROR:  integer out of range
+SELECT '340282366920938463463374607431768211455'::uint16 * '2147483647'::int4;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::int4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::int4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::int4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::int4;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 / '-4'::int4;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '-2'::int4;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '0'::int4;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::int4);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::int4;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::int4;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::int4;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 % '-4'::int4;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '-2'::int4;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '0'::int4;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::int4);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS int4);
+ int4 
+------
+    5
+(1 row)
+
+SELECT CAST('3000000000'::uint16 AS int4);
+ERROR:  int4 out of range
+SELECT '1'::uint16 < '1'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 < '2'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 < '4'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 <= '1'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 <= '2'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 <= '4'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 = '1'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 = '2'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::uint16 = '4'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 <> '1'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 <> '2'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 <> '4'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::uint16 >= '1'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::uint16 >= '2'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 >= '4'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::uint16 > '1'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::uint16 > '2'::int8;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::uint16 > '4'::int8;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btuint16int8cmp('1'::uint16, '1'::int8);
+ btuint16int8cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btuint16int8cmp('5'::uint16, '2'::int8);
+ btuint16int8cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btuint16int8cmp('3'::uint16, '4'::int8);
+ btuint16int8cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::uint16 + '1'::int8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 + '1'::int8;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 + '4'::int8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 + '2'::int8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '3'::uint16 + '-4'::int8;
+ERROR:  integer out of range
+SELECT '5'::uint16 + '-2'::int8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '340282366920938463463374607431768211455'::uint16 + '9223372036854775807'::int8;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 - '1'::int8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 - '1'::int8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 - '4'::int8;
+ERROR:  integer out of range
+SELECT '5'::uint16 - '2'::int8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '3'::uint16 - '-4'::int8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 - '-2'::int8;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::uint16 * '1'::int8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 * '1'::int8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 * '4'::int8;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::uint16 * '2'::int8;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '3'::uint16 * '-4'::int8;
+ERROR:  integer out of range
+SELECT '5'::uint16 * '-2'::int8;
+ERROR:  integer out of range
+SELECT '340282366920938463463374607431768211455'::uint16 * '9223372036854775807'::int8;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::uint16 / '1'::int8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 / '1'::int8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 / '4'::int8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 / '2'::int8;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::uint16 / '-4'::int8;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '-2'::int8;
+ERROR:  integer out of range
+SELECT '5'::uint16 / '0'::int8;
+ERROR:  division by zero
+SELECT pg_typeof('1'::uint16 % '1'::int8);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::uint16 % '1'::int8;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::uint16 % '4'::int8;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::uint16 % '2'::int8;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::uint16 % '-4'::int8;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '-2'::int8;
+ERROR:  integer out of range
+SELECT '5'::uint16 % '0'::int8;
+ERROR:  division by zero
+SELECT mod('5'::uint16, '2'::int8);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::uint16 AS int8);
+ int8 
+------
+    5
+(1 row)
+
+SELECT CAST('10000000000000000000'::uint16 AS int8);
 ERROR:  int8 out of range
 SELECT '2'::int2 < 5;
  ?column? 
@@ -15247,6 +25291,686 @@ SELECT CAST('5'::int2 AS uint8);
 
 SELECT CAST('-5'::int2 AS uint8);
 ERROR:  uint8 out of range
+SELECT '1'::int2 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int2 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int2 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int2 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int2 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int2 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int2 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int2 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int2 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int2 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int2 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int2 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int2 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int2 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int2 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int2 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int2 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int2 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint2int16cmp('1'::int2, '1'::int16);
+ btint2int16cmp 
+----------------
+              0
+(1 row)
+
+SELECT btint2int16cmp('5'::int2, '2'::int16);
+ btint2int16cmp 
+----------------
+              1
+(1 row)
+
+SELECT btint2int16cmp('3'::int2, '4'::int16);
+ btint2int16cmp 
+----------------
+             -1
+(1 row)
+
+SELECT pg_typeof('1'::int2 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int2 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int2 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int2 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int2 + '4'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int2 + '2'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int2 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int2 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '32767'::int2 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int2 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int2 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int2 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int2 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int2 - '4'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int2 - '2'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int2 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int2 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int2 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int2 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int2 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int2 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int2 * '4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int2 * '2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int2 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int2 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '32767'::int2 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int2 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int2 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int2 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int2 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int2 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int2 / '2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int2 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int2 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int2 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int2 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int2 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int2 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int2 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int2 % '4'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int2 % '2'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int2 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int2 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int2 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::int2, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int2 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int2 AS int16);
+ int16 
+-------
+ -5
+(1 row)
+
+SELECT '1'::int2 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int2 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int2 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int2 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int2 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int2 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int2 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int2 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int2 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int2 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int2 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int2 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int2 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int2 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int2 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int2 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int2 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int2 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint2uint16cmp('1'::int2, '1'::uint16);
+ btint2uint16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint2uint16cmp('5'::int2, '2'::uint16);
+ btint2uint16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint2uint16cmp('3'::int2, '4'::uint16);
+ btint2uint16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int2 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int2 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int2 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int2 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int2 + '4'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int2 + '2'::uint16;
+ERROR:  integer out of range
+SELECT '32767'::int2 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int2 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int2 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int2 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int2 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int2 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int2 - '2'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int2 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int2 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int2 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int2 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int2 * '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int2 * '2'::uint16;
+ERROR:  integer out of range
+SELECT '32767'::int2 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int2 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int2 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int2 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int2 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int2 / '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int2 / '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int2 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int2 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int2 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int2 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int2 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int2 % '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int2 % '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int2 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::int2, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int2 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int2 AS uint16);
+ERROR:  uint16 out of range
 SELECT '2'::int4 < 5;
  ?column? 
 ----------
@@ -17143,6 +27867,686 @@ SELECT CAST('5'::int4 AS uint8);
 
 SELECT CAST('-5'::int4 AS uint8);
 ERROR:  uint8 out of range
+SELECT '1'::int4 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int4 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int4 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int4 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int4 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int4 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int4 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int4 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int4 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int4 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int4 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int4 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int4 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int4 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int4 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int4 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int4 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int4 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint4int16cmp('1'::int4, '1'::int16);
+ btint4int16cmp 
+----------------
+              0
+(1 row)
+
+SELECT btint4int16cmp('5'::int4, '2'::int16);
+ btint4int16cmp 
+----------------
+              1
+(1 row)
+
+SELECT btint4int16cmp('3'::int4, '4'::int16);
+ btint4int16cmp 
+----------------
+             -1
+(1 row)
+
+SELECT pg_typeof('1'::int4 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int4 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int4 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int4 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int4 + '4'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int4 + '2'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int4 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int4 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '2147483647'::int4 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int4 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int4 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int4 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int4 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int4 - '4'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int4 - '2'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int4 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int4 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int4 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int4 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int4 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int4 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int4 * '4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int4 * '2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int4 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int4 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '2147483647'::int4 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int4 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int4 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int4 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int4 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int4 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int4 / '2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int4 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int4 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int4 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int4 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int4 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int4 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int4 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int4 % '4'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int4 % '2'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int4 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int4 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int4 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::int4, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int4 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int4 AS int16);
+ int16 
+-------
+ -5
+(1 row)
+
+SELECT '1'::int4 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int4 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int4 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int4 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int4 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int4 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int4 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int4 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int4 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int4 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int4 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int4 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int4 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int4 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int4 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int4 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int4 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int4 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint4uint16cmp('1'::int4, '1'::uint16);
+ btint4uint16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint4uint16cmp('5'::int4, '2'::uint16);
+ btint4uint16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint4uint16cmp('3'::int4, '4'::uint16);
+ btint4uint16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int4 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int4 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int4 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int4 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int4 + '4'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int4 + '2'::uint16;
+ERROR:  integer out of range
+SELECT '2147483647'::int4 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int4 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int4 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int4 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int4 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int4 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int4 - '2'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int4 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int4 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int4 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int4 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int4 * '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int4 * '2'::uint16;
+ERROR:  integer out of range
+SELECT '2147483647'::int4 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int4 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int4 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int4 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int4 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int4 / '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int4 / '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int4 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int4 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int4 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int4 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int4 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int4 % '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int4 % '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int4 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::int4, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int4 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int4 AS uint16);
+ERROR:  uint16 out of range
 SELECT '2'::int8 < 5;
  ?column? 
 ----------
@@ -19079,6 +30483,686 @@ SELECT CAST('5'::int8 AS uint8);
 
 SELECT CAST('-5'::int8 AS uint8);
 ERROR:  uint8 out of range
+SELECT '1'::int8 < '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int8 < '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int8 < '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int8 <= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int8 <= '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int8 <= '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int8 = '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int8 = '2'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int8 = '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int8 <> '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int8 <> '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int8 <> '4'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int8 >= '1'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int8 >= '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int8 >= '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int8 > '1'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int8 > '2'::int16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int8 > '4'::int16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint8int16cmp('1'::int8, '1'::int16);
+ btint8int16cmp 
+----------------
+              0
+(1 row)
+
+SELECT btint8int16cmp('5'::int8, '2'::int16);
+ btint8int16cmp 
+----------------
+              1
+(1 row)
+
+SELECT btint8int16cmp('3'::int8, '4'::int16);
+ btint8int16cmp 
+----------------
+             -1
+(1 row)
+
+SELECT pg_typeof('1'::int8 + '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int8 + '1'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int8 + '4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int8 + '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int8 + '4'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int8 + '2'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '3'::int8 + '-4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int8 + '-2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '9223372036854775807'::int8 + '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int8 - '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int8 - '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int8 - '4'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '5'::int8 - '2'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int8 - '4'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '-5'::int8 - '2'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '3'::int8 - '-4'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int8 - '-2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT pg_typeof('1'::int8 * '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int8 * '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int8 * '4'::int16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int8 * '2'::int16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int8 * '4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '-5'::int8 * '2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '3'::int8 * '-4'::int16;
+ ?column? 
+----------
+ -12
+(1 row)
+
+SELECT '5'::int8 * '-2'::int16;
+ ?column? 
+----------
+ -10
+(1 row)
+
+SELECT '9223372036854775807'::int8 * '170141183460469231731687303715884105727'::int16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int8 / '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int8 / '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int8 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int8 / '2'::int16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int8 / '4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '-5'::int8 / '2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '3'::int8 / '-4'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int8 / '-2'::int16;
+ ?column? 
+----------
+ -2
+(1 row)
+
+SELECT '5'::int8 / '0'::int16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int8 % '1'::int16);
+ pg_typeof 
+-----------
+ int16
+(1 row)
+
+SELECT '1'::int8 % '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int8 % '4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int8 % '2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int8 % '4'::int16;
+ ?column? 
+----------
+ -3
+(1 row)
+
+SELECT '-5'::int8 % '2'::int16;
+ ?column? 
+----------
+ -1
+(1 row)
+
+SELECT '3'::int8 % '-4'::int16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int8 % '-2'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int8 % '0'::int16;
+ERROR:  division by zero
+SELECT mod('5'::int8, '2'::int16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int8 AS int16);
+ int16 
+-------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int8 AS int16);
+ int16 
+-------
+ -5
+(1 row)
+
+SELECT '1'::int8 < '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int8 < '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int8 < '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int8 <= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int8 <= '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int8 <= '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int8 = '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int8 = '2'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '3'::int8 = '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int8 <> '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int8 <> '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int8 <> '4'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '1'::int8 >= '1'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '5'::int8 >= '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int8 >= '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '1'::int8 > '1'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5'::int8 > '2'::uint16;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '3'::int8 > '4'::uint16;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT btint8uint16cmp('1'::int8, '1'::uint16);
+ btint8uint16cmp 
+-----------------
+               0
+(1 row)
+
+SELECT btint8uint16cmp('5'::int8, '2'::uint16);
+ btint8uint16cmp 
+-----------------
+               1
+(1 row)
+
+SELECT btint8uint16cmp('3'::int8, '4'::uint16);
+ btint8uint16cmp 
+-----------------
+              -1
+(1 row)
+
+SELECT pg_typeof('1'::int8 + '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int8 + '1'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '3'::int8 + '4'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int8 + '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '-3'::int8 + '4'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-5'::int8 + '2'::uint16;
+ERROR:  integer out of range
+SELECT '9223372036854775807'::int8 + '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int8 - '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int8 - '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int8 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int8 - '2'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '-3'::int8 - '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int8 - '2'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int8 * '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int8 * '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int8 * '4'::uint16;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '5'::int8 * '2'::uint16;
+ ?column? 
+----------
+ 10
+(1 row)
+
+SELECT '-3'::int8 * '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int8 * '2'::uint16;
+ERROR:  integer out of range
+SELECT '9223372036854775807'::int8 * '340282366920938463463374607431768211455'::uint16;
+ERROR:  integer out of range
+SELECT pg_typeof('1'::int8 / '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int8 / '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '3'::int8 / '4'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int8 / '2'::uint16;
+ ?column? 
+----------
+ 2
+(1 row)
+
+SELECT '-3'::int8 / '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int8 / '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int8 / '0'::uint16;
+ERROR:  division by zero
+SELECT pg_typeof('1'::int8 % '1'::uint16);
+ pg_typeof 
+-----------
+ uint16
+(1 row)
+
+SELECT '1'::int8 % '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '3'::int8 % '4'::uint16;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '5'::int8 % '2'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '-3'::int8 % '4'::uint16;
+ERROR:  integer out of range
+SELECT '-5'::int8 % '2'::uint16;
+ERROR:  integer out of range
+SELECT '5'::int8 % '0'::uint16;
+ERROR:  division by zero
+SELECT mod('5'::int8, '2'::uint16);
+ mod 
+-----
+ 1
+(1 row)
+
+SELECT CAST('5'::int8 AS uint16);
+ uint16 
+--------
+ 5
+(1 row)
+
+SELECT CAST('-5'::int8 AS uint16);
+ERROR:  uint16 out of range
 SELECT '1'::int1 & '1'::int1;
  ?column? 
 ----------
@@ -20030,13 +32114,397 @@ SELECT sum(val::uint8) FROM (VALUES (1), (null), (2), (5)) _ (val);
 SELECT avg(val::uint8) FROM (SELECT NULL::uint8 WHERE false) _ (val);
  avg 
 -----
-    
+ 
 (1 row)
 
 SELECT avg(val::uint8) FROM (VALUES (1), (null), (2), (5), (6)) _ (val);
-        avg         
---------------------
- 3.5000000000000000
+ avg 
+-----
+ 3
+(1 row)
+
+SELECT '1'::int16 & '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int16 & '2'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 & '4'::int16;
+ ?column? 
+----------
+ 4
+(1 row)
+
+SELECT '1'::int16 | '1'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::int16 | '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 | '4'::int16;
+ ?column? 
+----------
+ 5
+(1 row)
+
+SELECT '1'::int16 # '1'::int16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::int16 # '2'::int16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::int16 # '4'::int16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT ~ '6'::int16;
+ ?column? 
+----------
+ -7
+(1 row)
+
+SELECT '6'::int16 << 1;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '6'::int16 << 3;
+ ?column? 
+----------
+ 48
+(1 row)
+
+SELECT '6'::int16 >> 1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '6'::int16 >> 3;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT int16smaller('1'::int16, '1'::int16);
+ int16smaller 
+--------------
+ 1
+(1 row)
+
+SELECT int16smaller('5'::int16, '2'::int16);
+ int16smaller 
+--------------
+ 2
+(1 row)
+
+SELECT int16smaller('3'::int16, '4'::int16);
+ int16smaller 
+--------------
+ 3
+(1 row)
+
+SELECT min(val::int16) FROM (VALUES (3), (5), (1), (4)) AS _ (val);
+ min 
+-----
+ 1
+(1 row)
+
+SELECT int16larger('1'::int16, '1'::int16);
+ int16larger 
+-------------
+ 1
+(1 row)
+
+SELECT int16larger('5'::int16, '2'::int16);
+ int16larger 
+-------------
+ 5
+(1 row)
+
+SELECT int16larger('3'::int16, '4'::int16);
+ int16larger 
+-------------
+ 4
+(1 row)
+
+SELECT max(val::int16) FROM (VALUES (3), (5), (1), (4)) AS _ (val);
+ max 
+-----
+ 5
+(1 row)
+
+SELECT bit_and(val::int16) FROM (VALUES (3), (6), (18)) AS _ (val);
+ bit_and 
+---------
+ 2
+(1 row)
+
+SELECT bit_or(val::int16) FROM (VALUES (9), (1), (4)) AS _ (val);
+ bit_or 
+--------
+ 13
+(1 row)
+
+SELECT int16_sum(NULL::int16, NULL::int16);
+ int16_sum 
+-----------
+ 
+(1 row)
+
+SELECT int16_sum(NULL::int16, 1::int16);
+ int16_sum 
+-----------
+ 1
+(1 row)
+
+SELECT int16_sum(2::int16, NULL::int16);
+ int16_sum 
+-----------
+ 2
+(1 row)
+
+SELECT int16_sum(2::int16, 1::int16);
+ int16_sum 
+-----------
+ 3
+(1 row)
+
+SELECT sum(val::int16) FROM (SELECT NULL::int16 WHERE false) _ (val);
+ sum 
+-----
+ 
+(1 row)
+
+SELECT sum(val::int16) FROM (VALUES (1), (null), (2), (5)) _ (val);
+ sum 
+-----
+ 8
+(1 row)
+
+SELECT avg(val::int16) FROM (SELECT NULL::int16 WHERE false) _ (val);
+ avg 
+-----
+ 
+(1 row)
+
+SELECT avg(val::int16) FROM (VALUES (1), (null), (2), (5), (6)) _ (val);
+ avg 
+-----
+ 3
+(1 row)
+
+SELECT '1'::uint16 & '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint16 & '2'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 & '4'::uint16;
+ ?column? 
+----------
+ 4
+(1 row)
+
+SELECT '1'::uint16 | '1'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT '5'::uint16 | '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 | '4'::uint16;
+ ?column? 
+----------
+ 5
+(1 row)
+
+SELECT '1'::uint16 # '1'::uint16;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT '5'::uint16 # '2'::uint16;
+ ?column? 
+----------
+ 7
+(1 row)
+
+SELECT '5'::uint16 # '4'::uint16;
+ ?column? 
+----------
+ 1
+(1 row)
+
+SELECT ~ '6'::uint16;
+                ?column?                 
+-----------------------------------------
+ 340282366920938463463374607431768211449
+(1 row)
+
+SELECT '6'::uint16 << 1;
+ ?column? 
+----------
+ 12
+(1 row)
+
+SELECT '6'::uint16 << 3;
+ ?column? 
+----------
+ 48
+(1 row)
+
+SELECT '6'::uint16 >> 1;
+ ?column? 
+----------
+ 3
+(1 row)
+
+SELECT '6'::uint16 >> 3;
+ ?column? 
+----------
+ 0
+(1 row)
+
+SELECT uint16smaller('1'::uint16, '1'::uint16);
+ uint16smaller 
+---------------
+ 1
+(1 row)
+
+SELECT uint16smaller('5'::uint16, '2'::uint16);
+ uint16smaller 
+---------------
+ 2
+(1 row)
+
+SELECT uint16smaller('3'::uint16, '4'::uint16);
+ uint16smaller 
+---------------
+ 3
+(1 row)
+
+SELECT min(val::uint16) FROM (VALUES (3), (5), (1), (4)) AS _ (val);
+ min 
+-----
+ 1
+(1 row)
+
+SELECT uint16larger('1'::uint16, '1'::uint16);
+ uint16larger 
+--------------
+ 1
+(1 row)
+
+SELECT uint16larger('5'::uint16, '2'::uint16);
+ uint16larger 
+--------------
+ 5
+(1 row)
+
+SELECT uint16larger('3'::uint16, '4'::uint16);
+ uint16larger 
+--------------
+ 4
+(1 row)
+
+SELECT max(val::uint16) FROM (VALUES (3), (5), (1), (4)) AS _ (val);
+ max 
+-----
+ 5
+(1 row)
+
+SELECT bit_and(val::uint16) FROM (VALUES (3), (6), (18)) AS _ (val);
+ bit_and 
+---------
+ 2
+(1 row)
+
+SELECT bit_or(val::uint16) FROM (VALUES (9), (1), (4)) AS _ (val);
+ bit_or 
+--------
+ 13
+(1 row)
+
+SELECT uint16_sum(NULL::uint16, NULL::uint16);
+ uint16_sum 
+------------
+ 
+(1 row)
+
+SELECT uint16_sum(NULL::uint16, 1::uint16);
+ uint16_sum 
+------------
+ 1
+(1 row)
+
+SELECT uint16_sum(2::uint16, NULL::uint16);
+ uint16_sum 
+------------
+ 2
+(1 row)
+
+SELECT uint16_sum(2::uint16, 1::uint16);
+ uint16_sum 
+------------
+ 3
+(1 row)
+
+SELECT sum(val::uint16) FROM (SELECT NULL::uint16 WHERE false) _ (val);
+ sum 
+-----
+ 
+(1 row)
+
+SELECT sum(val::uint16) FROM (VALUES (1), (null), (2), (5)) _ (val);
+ sum 
+-----
+ 8
+(1 row)
+
+SELECT avg(val::uint16) FROM (SELECT NULL::uint16 WHERE false) _ (val);
+ avg 
+-----
+ 
+(1 row)
+
+SELECT avg(val::uint16) FROM (VALUES (1), (null), (2), (5), (6)) _ (val);
+ avg 
+-----
+ 3
 (1 row)
 
 CREATE TABLE test_int1 (x int1);
@@ -20104,6 +32572,32 @@ EXPLAIN (COSTS OFF) SELECT * FROM test_int1 WHERE x = 3::uint8;
 (2 rows)
 
 SELECT * FROM test_int1 WHERE x = 3::uint8;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int1 WHERE x = 3::int16;
+                  QUERY PLAN                   
+-----------------------------------------------
+ Index Scan using test_int1_x_key on test_int1
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_int1 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int1 WHERE x = 3::uint16;
+                  QUERY PLAN                   
+-----------------------------------------------
+ Index Scan using test_int1_x_key on test_int1
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_int1 WHERE x = 3::uint16;
  x 
 ---
  3
@@ -20220,6 +32714,32 @@ SELECT * FROM test_uint1 WHERE x = 3::uint8;
  3
 (1 row)
 
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint1 WHERE x = 3::int16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_uint1_x_key on test_uint1
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_uint1 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint1 WHERE x = 3::uint16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_uint1_x_key on test_uint1
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_uint1 WHERE x = 3::uint16;
+ x 
+---
+ 3
+(1 row)
+
 EXPLAIN (COSTS OFF) SELECT * FROM test_uint1 WHERE x = 3::int2;
                    QUERY PLAN                    
 -------------------------------------------------
@@ -20326,6 +32846,32 @@ EXPLAIN (COSTS OFF) SELECT * FROM test_uint2 WHERE x = 3::uint8;
 (2 rows)
 
 SELECT * FROM test_uint2 WHERE x = 3::uint8;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint2 WHERE x = 3::int16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_uint2_x_key on test_uint2
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_uint2 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint2 WHERE x = 3::uint16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_uint2_x_key on test_uint2
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_uint2 WHERE x = 3::uint16;
  x 
 ---
  3
@@ -20442,6 +32988,32 @@ SELECT * FROM test_uint4 WHERE x = 3::uint8;
  3
 (1 row)
 
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint4 WHERE x = 3::int16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_uint4_x_key on test_uint4
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_uint4 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint4 WHERE x = 3::uint16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_uint4_x_key on test_uint4
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_uint4 WHERE x = 3::uint16;
+ x 
+---
+ 3
+(1 row)
+
 EXPLAIN (COSTS OFF) SELECT * FROM test_uint4 WHERE x = 3::int2;
                    QUERY PLAN                    
 -------------------------------------------------
@@ -20553,6 +33125,32 @@ SELECT * FROM test_uint8 WHERE x = 3::uint8;
  3
 (1 row)
 
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint8 WHERE x = 3::int16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_uint8_x_key on test_uint8
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_uint8 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint8 WHERE x = 3::uint16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_uint8_x_key on test_uint8
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_uint8 WHERE x = 3::uint16;
+ x 
+---
+ 3
+(1 row)
+
 EXPLAIN (COSTS OFF) SELECT * FROM test_uint8 WHERE x = 3::int2;
                    QUERY PLAN                    
 -------------------------------------------------
@@ -20587,6 +33185,280 @@ EXPLAIN (COSTS OFF) SELECT * FROM test_uint8 WHERE x = 3::int8;
 (2 rows)
 
 SELECT * FROM test_uint8 WHERE x = 3::int8;
+ x 
+---
+ 3
+(1 row)
+
+RESET enable_seqscan;
+RESET enable_bitmapscan;
+CREATE TABLE test_int16 (x int16);
+CREATE UNIQUE INDEX test_int16_x_key ON test_int16 USING btree (x);
+INSERT INTO test_int16 VALUES (1), (2), (3), (4), (5), (null);
+SET enable_seqscan = off;
+SET enable_bitmapscan = off;
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::int1;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::int1)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::int1;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::uint1;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::uint1)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::uint1;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::uint2;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::uint2)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::uint2;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::uint4;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::uint4)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::uint4;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::uint8;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::uint8)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::uint8;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::int16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::uint16;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::uint16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::int2;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::smallint)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::int2;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::int4;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = 3)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::int4;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int16 WHERE x = 3::int8;
+                   QUERY PLAN                    
+-------------------------------------------------
+ Index Scan using test_int16_x_key on test_int16
+   Index Cond: (x = '3'::bigint)
+(2 rows)
+
+SELECT * FROM test_int16 WHERE x = 3::int8;
+ x 
+---
+ 3
+(1 row)
+
+RESET enable_seqscan;
+RESET enable_bitmapscan;
+CREATE TABLE test_uint16 (x uint16);
+CREATE UNIQUE INDEX test_uint16_x_key ON test_uint16 USING btree (x);
+INSERT INTO test_uint16 VALUES (1), (2), (3), (4), (5), (null);
+SET enable_seqscan = off;
+SET enable_bitmapscan = off;
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::int1;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::int1)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::int1;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::uint1;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::uint1)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::uint1;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::uint2;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::uint2)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::uint2;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::uint4;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::uint4)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::uint4;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::uint8;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::uint8)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::uint8;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::int16;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::uint16;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::uint16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::int2;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::smallint)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::int2;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::int4;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = 3)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::int4;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_uint16 WHERE x = 3::int8;
+                    QUERY PLAN                     
+---------------------------------------------------
+ Index Scan using test_uint16_x_key on test_uint16
+   Index Cond: (x = '3'::bigint)
+(2 rows)
+
+SELECT * FROM test_uint16 WHERE x = 3::int8;
  x 
 ---
  3
@@ -20664,6 +33536,32 @@ SELECT * FROM test_int2 WHERE x = 3::uint8;
  3
 (1 row)
 
+EXPLAIN (COSTS OFF) SELECT * FROM test_int2 WHERE x = 3::int16;
+                  QUERY PLAN                   
+-----------------------------------------------
+ Index Scan using test_int2_x_key on test_int2
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_int2 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int2 WHERE x = 3::uint16;
+                  QUERY PLAN                   
+-----------------------------------------------
+ Index Scan using test_int2_x_key on test_int2
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_int2 WHERE x = 3::uint16;
+ x 
+---
+ 3
+(1 row)
+
 RESET enable_seqscan;
 RESET enable_bitmapscan;
 CREATE TABLE test_int4 (x int4);
@@ -20736,6 +33634,32 @@ SELECT * FROM test_int4 WHERE x = 3::uint8;
  3
 (1 row)
 
+EXPLAIN (COSTS OFF) SELECT * FROM test_int4 WHERE x = 3::int16;
+                  QUERY PLAN                   
+-----------------------------------------------
+ Index Scan using test_int4_x_key on test_int4
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_int4 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int4 WHERE x = 3::uint16;
+                  QUERY PLAN                   
+-----------------------------------------------
+ Index Scan using test_int4_x_key on test_int4
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_int4 WHERE x = 3::uint16;
+ x 
+---
+ 3
+(1 row)
+
 RESET enable_seqscan;
 RESET enable_bitmapscan;
 CREATE TABLE test_int8 (x int8);
@@ -20803,6 +33727,32 @@ EXPLAIN (COSTS OFF) SELECT * FROM test_int8 WHERE x = 3::uint8;
 (2 rows)
 
 SELECT * FROM test_int8 WHERE x = 3::uint8;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int8 WHERE x = 3::int16;
+                  QUERY PLAN                   
+-----------------------------------------------
+ Index Scan using test_int8_x_key on test_int8
+   Index Cond: (x = '3'::int16)
+(2 rows)
+
+SELECT * FROM test_int8 WHERE x = 3::int16;
+ x 
+---
+ 3
+(1 row)
+
+EXPLAIN (COSTS OFF) SELECT * FROM test_int8 WHERE x = 3::uint16;
+                  QUERY PLAN                   
+-----------------------------------------------
+ Index Scan using test_int8_x_key on test_int8
+   Index Cond: (x = '3'::uint16)
+(2 rows)
+
+SELECT * FROM test_int8 WHERE x = 3::uint16;
  x 
 ---
  3
