@@ -8,6 +8,14 @@ This extension provides additional integer types for PostgreSQL:
 - `uint2` (unsigned 16-bit integer)
 - `uint4` (unsigned 32-bit integer)
 - `uint8` (unsigned 64-bit integer)
+- `int16` (signed 128-bit integer)
+- `uint16` (unsigned 128-bit integer)
+
+This is forked from @petere's original work, adding:
+
+- fast itoa and utoa functions to replace use of sprintf("%u")
+- binary send/receive for all types
+- 128-bit integer types
 
 Installation
 ------------
