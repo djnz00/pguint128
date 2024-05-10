@@ -138,6 +138,8 @@ def next_bigger_type(typ):
 
 
 def write_c_function(f, funcname, argtypes, rettype, body):
+    body = body.replace("result = arg1 + arg2;\n\nif (SAMESIGN(arg1, arg2) && !SAMESIGN(result, arg1))", "if (__builtin_add_overflow(arg1, arg2, &result))");
+    body = body.replace("result = arg1 - arg2;\n\nif (!SAMESIGN(arg1, arg2) && !SAMESIGN(result, arg1))", "if (__builtin_sub_overflow(arg1, arg2, &result))");
     f.write("""
 PG_FUNCTION_INFO_V1({funcname});
 Datum
@@ -166,6 +168,7 @@ Datum
         f.write("\t{0} *result = ({0} *)palloc(sizeof({0}));\n"
                 .format(c_types[rettype]))
         body = body.replace("result", "(*result)")
+        body = body.replace("&(*result)", "result")
         body = body.replace("PG_RETURN_{0}(0)".format(c_types[rettype].upper()), "{ *result = 0; PG_RETURN_POINTER(result); }")
     else:
         f.write("\t{0} result;\n".format(c_types[rettype]))
