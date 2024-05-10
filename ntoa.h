@@ -244,11 +244,12 @@ utoa128(char *buf, uint128_t v)
 }
 
 static void
-itoa128(char *buf, int128_t v)
+itoa128(char *buf, int128_t v_)
 {
-	if (v < 0) {
+	uint128_t v = v_;
+	if (v_ < 0) {
 		*buf++ = '-';
-		v = -v;
+		v = ~v + 1;
 	}
 	utoa128(buf, v);
 }
