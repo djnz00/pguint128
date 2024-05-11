@@ -531,7 +531,7 @@ uint16send(PG_FUNCTION_ARGS)
 	pq_begintypsend(&buf);
 	enlargeStringInfo(&buf, 16);
 	Assert(buf.len + 16 <= buf.maxlen);
-	v->i = (__int128_t)pg_bswap128(v->i);
+	v->i = pg_bswap128(v->i);
 	memcpy((char *)(buf.data + buf.len), v, 16);
 	buf.len += 16;
 	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));

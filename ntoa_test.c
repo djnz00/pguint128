@@ -30,7 +30,7 @@ testi8()
 		assert(i < 0 ? (buf[1] != '0') : (!i || buf[0] != '0'));
 		assert(strtol(buf, 0, 10) == i);
 		++i;
-	} while (i != -128);	/* wraparound */
+	} while (i != 127);
 	printf("int8_t final value %s\n", buf);
 }
 
@@ -120,7 +120,8 @@ atoi128(const char *s, int128_t *r)
 	return atou128(s, (uint128_t *)r);
 }
 
-/* both gcc and clang have a 128bit wraparound bug, so avoid that below */
+/* integer signed wraparound is UB and breaks with optimization,
+ * so avoid that below */
 
 void
 testi128()
@@ -160,7 +161,7 @@ testu128()
 		assert(atou128(buf, &j) == n);
 		assert(i == j);
 		i += (((uint128_t)0x00000100)<<96);
-	} while (i != (((uint128_t)0xffffff00)<<96));
+	} while (i);
 	printf("uint128_t final value %s\n", buf);
 }
 
