@@ -127,6 +127,8 @@ def next_bigger_type(typ):
 
 
 def write_c_function(f, funcname, argtypes, rettype, body):
+    body = body.replace("result = arg1 + arg2;\n\nif (SAMESIGN(arg1, arg2) && !SAMESIGN(result, arg1))", "if (__builtin_add_overflow(arg1, arg2, &result))");
+    body = body.replace("result = arg1 - arg2;\n\nif (!SAMESIGN(arg1, arg2) && !SAMESIGN(result, arg1))", "if (__builtin_sub_overflow(arg1, arg2, &result))");
     f.write("""
 PG_FUNCTION_INFO_V1({funcname});
 Datum
@@ -242,13 +244,7 @@ def write_sql_operator(f, funcname, leftarg, rightarg, op, rettype):
 def write_cmp_c_function(f, leftarg, rightarg):
     funcname = 'bt' + coalesce(leftarg, '') + coalesce(rightarg, '') + 'cmp'
     write_c_function(f, funcname, [leftarg, rightarg], 'int4',
-                     """if (arg1 > arg2)
-\tresult = 1;
-else if (arg1 == arg2)
-\tresult = 0;
-else
-\tresult = -1;""")
-
+                     "result = (arg1 > arg2) - (arg1 < arg2);")
 
 def write_cmp_sql_function(f, leftarg, rightarg):
     funcname = 'bt' + coalesce(leftarg, '') + coalesce(rightarg, '') + 'cmp'
@@ -264,12 +260,7 @@ bt{typ}fastcmp(Datum x, Datum y, SortSupport ssup)
 \t{ctype} a = DatumGet{Ctype}(x);
 \t{ctype} b = DatumGet{Ctype}(y);
 
-\tif (a > b)
-\t\treturn 1;
-\telse if (a == b)
-\t\treturn 0;
-\telse
-\t\treturn -1;
+\treturn (a > b) - (a < b);
 }}
 
 PG_FUNCTION_INFO_V1(bt{typ}sortsupport);
@@ -329,9 +320,16 @@ avg_trans_types = {
     'uint1': '_int8',
     'uint2': '_int8',
     'uint4': '_int8',
-    'uint8': '_int8',
+    'uint8': 'uint8[]',
 }
 
+avg_final_funcs = {
+    'int1': 'int8_avg',
+    'uint1': 'int8_avg',
+    'uint2': 'int8_avg',
+    'uint4': 'int8_avg',
+    'uint8': 'uint8_avg',
+}
 
 def write_arithmetic_op(f_c, f_sql, f_test_sql, op, leftarg, rightarg):
     args = sorted([leftarg, rightarg], key=lambda x: (type_bits(x), type_unsigned(x)))
@@ -612,9 +610,9 @@ SELECT sum(val::{argtype}) FROM (VALUES (1), (null), (2), (5)) _ (val);
         sfunc = "{argtype}_avg_accum".format(argtype=arg)
         stype = avg_trans_types[arg]
         write_sql_function(f_sql, sfunc, [stype, arg], stype)
-        f_sql.write("CREATE AGGREGATE avg({arg}) (SFUNC = {sfunc}, STYPE = {stype}, FINALFUNC = int8_avg,"
+        f_sql.write("CREATE AGGREGATE avg({arg}) (SFUNC = {sfunc}, STYPE = {stype}, FINALFUNC = {finalfunc},"
                     " INITCOND = '{{0,0}}');\n\n"
-                    .format(arg=arg, sfunc=sfunc, stype=stype))
+                    .format(arg=arg, sfunc=sfunc, stype=stype, finalfunc=avg_final_funcs[arg]))
         f_test_sql.write("""
 SELECT avg(val::{argtype}) FROM (SELECT NULL::{argtype} WHERE false) _ (val);
 SELECT avg(val::{argtype}) FROM (VALUES (1), (null), (2), (5), (6)) _ (val);

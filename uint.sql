@@ -229,3 +229,8 @@ CREATE OPERATOR - (
    PROCEDURE = int1um,
    RIGHTARG = int1
 );
+
+
+CREATE FUNCTION uint8_avg(uint8[]) RETURNS numeric
+    IMMUTABLE STRICT LANGUAGE C
+    AS '$libdir/uint', 'uint8_avg';
