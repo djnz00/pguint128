@@ -32114,13 +32114,13 @@ SELECT sum(val::uint8) FROM (VALUES (1), (null), (2), (5)) _ (val);
 SELECT avg(val::uint8) FROM (SELECT NULL::uint8 WHERE false) _ (val);
  avg 
 -----
- 
+    
 (1 row)
 
 SELECT avg(val::uint8) FROM (VALUES (1), (null), (2), (5), (6)) _ (val);
- avg 
------
- 3
+        avg         
+--------------------
+ 3.5000000000000000
 (1 row)
 
 SELECT '1'::int16 & '1'::int16;
@@ -32306,13 +32306,13 @@ SELECT sum(val::int16) FROM (VALUES (1), (null), (2), (5)) _ (val);
 SELECT avg(val::int16) FROM (SELECT NULL::int16 WHERE false) _ (val);
  avg 
 -----
- 
+    
 (1 row)
 
 SELECT avg(val::int16) FROM (VALUES (1), (null), (2), (5), (6)) _ (val);
- avg 
------
- 3
+        avg         
+--------------------
+ 3.5000000000000000
 (1 row)
 
 SELECT '1'::uint16 & '1'::uint16;
@@ -32498,13 +32498,13 @@ SELECT sum(val::uint16) FROM (VALUES (1), (null), (2), (5)) _ (val);
 SELECT avg(val::uint16) FROM (SELECT NULL::uint16 WHERE false) _ (val);
  avg 
 -----
- 
+    
 (1 row)
 
 SELECT avg(val::uint16) FROM (VALUES (1), (null), (2), (5), (6)) _ (val);
- avg 
------
- 3
+        avg         
+--------------------
+ 3.5000000000000000
 (1 row)
 
 CREATE TABLE test_int1 (x int1);

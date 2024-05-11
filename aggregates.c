@@ -139,68 +139,65 @@ Datum uint8_avg_accum(PG_FUNCTION_ARGS) {
 	PG_RETURN_ARRAYTYPE_P(array);
 }
 
-static Datum
-uint64_to_numeric(PG_FUNCTION_ARGS)
+static Numeric
+uint64_to_numeric(uint64_t u)
 {
-	uint64_t u = PG_GETARG_UINT64(0);
-	Datum v;
+	Numeric v;
 	if (unlikely(u & (1ULL<<63))) {
 		/* double bit62 to get bit63 */
-		Datum bit62 = NumericGetDatum(int64_to_numeric(1ULL<<62));
-		Datum bit63 = DirectFunctionCall2(numeric_add, bit62, bit62);
-		v = NumericGetDatum(int64_to_numeric(u & ~(1ULL<<63)));
-		v = DirectFunctionCall2(numeric_add, v, bit63);
-		pfree(DatumGetPointer(bit62));
-		pfree(DatumGetPointer(bit63));
+		Numeric bit62 = int64_to_numeric(1ULL<<62);
+		Numeric bit63 = numeric_add_opt_error(bit62, bit62, NULL);
+		Numeric intermediate = int64_to_numeric(u & ~(1ULL<<63));
+		v = numeric_add_opt_error(intermediate, bit63, NULL);
+		pfree(bit62);
+		pfree(bit63);
+		pfree(intermediate);
 	} else {
-		v = NumericGetDatum(int64_to_numeric(u));
+		v = int64_to_numeric(u);
 	}
-	PG_RETURN_DATUM(v);
+	return v;
 }
 
-static Datum
-uint128_to_numeric(PG_FUNCTION_ARGS)
+static Numeric
+uint128_to_numeric(uint128_t u)
 {
-	uint128_t u = *(uint128_t *)PG_GETARG_POINTER(0);
-	Datum v;
+	Numeric v;
 	if (unlikely(u >= (((uint128_t)1)<<64))) {
 		/* quadruple bit62 to get bit64 */
-		Datum bit62 = NumericGetDatum(int64_to_numeric(1ULL<<62));
-		Datum bit63 = DirectFunctionCall2(numeric_add, bit62, bit62);
-		Datum bit64 = DirectFunctionCall2(numeric_add, bit63, bit63);
-		Datum high =
-			DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(u>>64));
-		Datum low = DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(u));
-		Datum intermediate = DirectFunctionCall2(numeric_mul, high, bit64);
-		v = DirectFunctionCall2(numeric_add, intermediate, low);
-		pfree(DatumGetPointer(bit62));
-		pfree(DatumGetPointer(bit63));
-		pfree(DatumGetPointer(bit64));
-		pfree(DatumGetPointer(high));
-		pfree(DatumGetPointer(low));
-		pfree(DatumGetPointer(intermediate));
+		Numeric bit62 = int64_to_numeric(1ULL<<62);
+		Numeric bit63 = numeric_add_opt_error(bit62, bit62, NULL);
+		Numeric bit64 = numeric_add_opt_error(bit63, bit63, NULL);
+		Numeric high = uint64_to_numeric(u>>64);
+		Numeric low = uint64_to_numeric(u);
+		Numeric intermediate = numeric_mul_opt_error(high, bit64, NULL);
+		v = numeric_add_opt_error(intermediate, low, NULL);
+		pfree(bit62);
+		pfree(bit63);
+		pfree(bit64);
+		pfree(high);
+		pfree(low);
+		pfree(intermediate);
 	} else {
-		v = DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(u));
+		v = uint64_to_numeric(u);
 	}
-	PG_RETURN_DATUM(v);
+	return v;
 }
 
-static Datum
-int128_to_numeric(PG_FUNCTION_ARGS)
+static Numeric
+int128_to_numeric(int128_t u_)
 {
-	int128_t u_ = *(int128_t *)PG_GETARG_POINTER(0);
 	uint128_t u = u_;
-	Datum v;
+	Numeric v;
 	if (u_ < 0) {
-		u = ~u + 1;
-		Datum intermediate =
-			DirectFunctionCall1(uint128_to_numeric, PointerGetDatum(&u));
-		v = DirectFunctionCall1(numeric_uminus, intermediate);
-		pfree(DatumGetPointer(intermediate));
+		Numeric intermediate = uint128_to_numeric(~u + 1);
+		v = DatumGetNumeric(
+				DirectFunctionCall1(
+					numeric_uminus, NumericGetDatum(intermediate)));
+		pfree(intermediate);
 	} else {
-		v = DirectFunctionCall1(uint128_to_numeric, PointerGetDatum(&u));
+		v = uint128_to_numeric(u);
 	}
-	PG_RETURN_DATUM(v);
+	return v;
 }
 
 PG_FUNCTION_INFO_V1(uint8_avg);
@@ -209,7 +206,7 @@ Datum uint8_avg(PG_FUNCTION_ARGS) {
 		PG_GETARG_ARRAYTYPE_P(0) :
 		PG_GETARG_ARRAYTYPE_P_COPY(0);
 	const uint64 *state;
-	Datum sumd, countd;
+	Numeric sum, count, result;
 
 	if (ARR_NDIM(array) != 1 ||
 		ARR_DIMS(array)[0] != 2 ||
@@ -223,10 +220,13 @@ Datum uint8_avg(PG_FUNCTION_ARGS) {
 
 	if (unlikely(!state[1])) PG_RETURN_NULL();
 
-	sumd = DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(state[0]));
-	countd = DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(state[1]));
+	sum = uint64_to_numeric(state[0]);
+	count = uint64_to_numeric(state[1]);
+	result = numeric_div_opt_error(sum, count, NULL);
+	pfree(sum);
+	pfree(count);
 
-	PG_RETURN_DATUM(DirectFunctionCall2(numeric_div, sumd, countd));
+	PG_RETURN_DATUM(NumericGetDatum(result));
 }
 
 PG_FUNCTION_INFO_V1(int16_avg_accum);
@@ -262,7 +262,7 @@ Datum int16_avg(PG_FUNCTION_ARGS) {
 		PG_GETARG_ARRAYTYPE_P(0) :
 		PG_GETARG_ARRAYTYPE_P_COPY(0);
 	const int128_t *state;
-	Datum sumd, countd;
+	Numeric sum, count, result;
 
 	if (ARR_NDIM(array) != 1 ||
 		ARR_DIMS(array)[0] != 2 ||
@@ -276,12 +276,13 @@ Datum int16_avg(PG_FUNCTION_ARGS) {
 
 	if (unlikely(!state[1])) PG_RETURN_NULL();
 
-	sumd = DirectFunctionCall1(
-			uint16_to_numeric, PointerGetDatum(&state[0]));
-	countd = DirectFunctionCall1(
-			uint16_to_numeric, PointerGetDatum(&state[1]));
+	sum = int128_to_numeric(state[0]);
+	count = int128_to_numeric(state[1]);
+	result = numeric_div_opt_error(sum, count, NULL);
+	pfree(sum);
+	pfree(count);
 
-	PG_RETURN_DATUM(DirectFunctionCall2(numeric_div, sumd, countd));
+	PG_RETURN_DATUM(NumericGetDatum(result));
 }
 
 PG_FUNCTION_INFO_V1(uint16_avg_accum);
@@ -317,7 +318,7 @@ Datum uint16_avg(PG_FUNCTION_ARGS) {
 		PG_GETARG_ARRAYTYPE_P(0) :
 		PG_GETARG_ARRAYTYPE_P_COPY(0);
 	const uint128_t *state;
-	Datum sumd, countd;
+	Numeric sum, count, result;
 
 	if (ARR_NDIM(array) != 1 ||
 		ARR_DIMS(array)[0] != 2 ||
@@ -331,10 +332,11 @@ Datum uint16_avg(PG_FUNCTION_ARGS) {
 
 	if (unlikely(!state[1])) PG_RETURN_NULL();
 
-	sumd = DirectFunctionCall1(
-			int16_to_numeric, PointerGetDatum(&state[0]));
-	countd = DirectFunctionCall1(
-			int16_to_numeric, PointerGetDatum(&state[1]));
+	sum = uint128_to_numeric(state[0]);
+	count = uint128_to_numeric(state[1]);
+	result = numeric_div_opt_error(sum, count, NULL);
+	pfree(sum);
+	pfree(count);
 
-	PG_RETURN_DATUM(DirectFunctionCall2(numeric_div, sumd, countd));
+	PG_RETURN_DATUM(NumericGetDatum(result));
 }
