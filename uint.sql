@@ -330,14 +330,14 @@ CREATE OPERATOR - (
 );
 
 
-CREATE FUNCTION uint8_avg(uint8[]) RETURNS uint8
+CREATE FUNCTION uint8_avg(uint8[]) RETURNS numeric
     IMMUTABLE STRICT LANGUAGE C
     AS '$libdir/uint', 'uint8_avg';
 
-CREATE FUNCTION int16_avg(int16[]) RETURNS int16
+CREATE FUNCTION int16_avg(int16[]) RETURNS numeric
     IMMUTABLE STRICT LANGUAGE C
     AS '$libdir/uint', 'int16_avg';
 
-CREATE FUNCTION uint16_avg(uint16[]) RETURNS uint16
+CREATE FUNCTION uint16_avg(uint16[]) RETURNS numeric
     IMMUTABLE STRICT LANGUAGE C
     AS '$libdir/uint', 'uint16_avg';

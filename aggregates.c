@@ -146,10 +146,12 @@ uint64_to_numeric(PG_FUNCTION_ARGS)
 	Datum v;
 	if (unlikely(u & (1ULL<<63))) {
 		/* double bit62 to get bit63 */
-		Datum bit63 = NumericGetDatum(int64_to_numeric(1ULL<<62));
-		bit63 = DirectFunctionCall2(numeric_add, bit63, bit63);
+		Datum bit62 = NumericGetDatum(int64_to_numeric(1ULL<<62));
+		Datum bit63 = DirectFunctionCall2(numeric_add, bit62, bit62);
 		v = NumericGetDatum(int64_to_numeric(u & ~(1ULL<<63)));
 		v = DirectFunctionCall2(numeric_add, v, bit63);
+		pfree(DatumGetPointer(bit62));
+		pfree(DatumGetPointer(bit63));
 	} else {
 		v = NumericGetDatum(int64_to_numeric(u));
 	}
@@ -157,20 +159,26 @@ uint64_to_numeric(PG_FUNCTION_ARGS)
 }
 
 static Datum
-uint16_to_numeric(PG_FUNCTION_ARGS)
+uint128_to_numeric(PG_FUNCTION_ARGS)
 {
 	uint128_t u = *(uint128_t *)PG_GETARG_POINTER(0);
 	Datum v;
 	if (unlikely(u >= (((uint128_t)1)<<64))) {
 		/* quadruple bit62 to get bit64 */
-		Datum bit64 = NumericGetDatum(int64_to_numeric(1ULL<<62));
-		bit64 = DirectFunctionCall2(numeric_add, bit64, bit64);
-		bit64 = DirectFunctionCall2(numeric_add, bit64, bit64);
-		v = DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(u>>64));
-		v = DirectFunctionCall2(numeric_mul, v, bit64);
-		v = DirectFunctionCall2(
-				numeric_add, v,
-				DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(u)));
+		Datum bit62 = NumericGetDatum(int64_to_numeric(1ULL<<62));
+		Datum bit63 = DirectFunctionCall2(numeric_add, bit62, bit62);
+		Datum bit64 = DirectFunctionCall2(numeric_add, bit63, bit63);
+		Datum high =
+			DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(u>>64));
+		Datum low = DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(u));
+		Datum intermediate = DirectFunctionCall2(numeric_mul, high, bit64);
+		v = DirectFunctionCall2(numeric_add, intermediate, low);
+		pfree(DatumGetPointer(bit62));
+		pfree(DatumGetPointer(bit63));
+		pfree(DatumGetPointer(bit64));
+		pfree(DatumGetPointer(high));
+		pfree(DatumGetPointer(low));
+		pfree(DatumGetPointer(intermediate));
 	} else {
 		v = DirectFunctionCall1(uint64_to_numeric, UInt64GetDatum(u));
 	}
@@ -178,14 +186,20 @@ uint16_to_numeric(PG_FUNCTION_ARGS)
 }
 
 static Datum
-int16_to_numeric(PG_FUNCTION_ARGS)
+int128_to_numeric(PG_FUNCTION_ARGS)
 {
 	int128_t u_ = *(int128_t *)PG_GETARG_POINTER(0);
 	uint128_t u = u_;
 	Datum v;
-	if (u_ < 0) u = ~u + 1;
-	v = DirectFunctionCall1(uint16_to_numeric, PointerGetDatum(&u));
-	if (u_ < 0) v = DirectFunctionCall1(numeric_uminus, v);
+	if (u_ < 0) {
+		u = ~u + 1;
+		Datum intermediate =
+			DirectFunctionCall1(uint128_to_numeric, PointerGetDatum(&u));
+		v = DirectFunctionCall1(numeric_uminus, intermediate);
+		pfree(DatumGetPointer(intermediate));
+	} else {
+		v = DirectFunctionCall1(uint128_to_numeric, PointerGetDatum(&u));
+	}
 	PG_RETURN_DATUM(v);
 }
 
