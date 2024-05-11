@@ -39,5 +39,12 @@
 
 #define SAMESIGN(a,b)	(((a) < 0) == ((b) < 0))
 
-typedef __int128_t int128_t;
-typedef __uint128_t uint128_t;
+/* force gcc not to assume 16-byte alignment */
+#pragma pack(push, 8)
+typedef struct {
+	__uint128_t	i;
+} xuint128;
+typedef struct {
+	__int128_t	i;
+} xint128;
+#pragma pack(pop)

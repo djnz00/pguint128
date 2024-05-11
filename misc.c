@@ -25,12 +25,12 @@ PG_FUNCTION_INFO_V1(int16um);
 Datum
 int16um(PG_FUNCTION_ARGS)
 {
-	int128_t	arg = *(int128_t *)PG_GETARG_POINTER(0);
-	int128_t	*result = (int128_t *)palloc(sizeof(int128_t));
+	xint128 *arg = (xint128 *)PG_GETARG_POINTER(0);
+	xint128 *result = (xint128 *)palloc(sizeof(xint128));
 
-	*result = -arg;
+	result->i = -(arg->i);
 	/* overflow check */
-	if (arg != 0 && SAMESIGN((*result), arg))
+	if (arg != 0 && SAMESIGN((result->i), arg))
 		ereport(ERROR,
 				(errcode(ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE),
 				 errmsg("integer out of range")));

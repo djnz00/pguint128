@@ -71,14 +71,14 @@ int16_sum(PG_FUNCTION_ARGS)
 	}
 	if (unlikely(PG_ARGISNULL(1))) PG_RETURN_POINTER(PG_GETARG_POINTER(0));
 	{
-		int128_t *l = (int128_t *)PG_GETARG_POINTER(0);
-		int128_t r = *(int128_t *)PG_GETARG_POINTER(1);
+		xint128 *l = (xint128 *)PG_GETARG_POINTER(0);
+		xint128 *r = (xint128 *)PG_GETARG_POINTER(1);
 		if (AggCheckCallContext(fcinfo, NULL)) {
-		  *l += r;
+		  l->i += r->i;
 		  PG_RETURN_POINTER(l);
 		} else {
-		  int128_t *v = (int128_t *)palloc(sizeof(int128_t));
-		  *v = *l + r;
+		  xint128 *v = (xint128 *)palloc(sizeof(xint128));
+		  v->i = l->i + r->i;
 		  PG_RETURN_POINTER(v);
 		}
 	}
@@ -94,14 +94,14 @@ uint16_sum(PG_FUNCTION_ARGS)
 	}
 	if (unlikely(PG_ARGISNULL(1))) PG_RETURN_POINTER(PG_GETARG_POINTER(0));
 	{
-		uint128_t *l = (uint128_t *)PG_GETARG_POINTER(0);
-		uint128_t r = *(uint128_t *)PG_GETARG_POINTER(1);
+		xuint128 *l = (xuint128 *)PG_GETARG_POINTER(0);
+		xuint128 *r = (xuint128 *)PG_GETARG_POINTER(1);
 		if (AggCheckCallContext(fcinfo, NULL)) {
-		  *l += r;
+		  l->i += r->i;
 		  PG_RETURN_POINTER(l);
 		} else {
-		  uint128_t *v = (uint128_t *)palloc(sizeof(uint128_t));
-		  *v = *l + r;
+		  xuint128 *v = (xuint128 *)palloc(sizeof(xuint128));
+		  v->i = l->i + r->i;
 		  PG_RETURN_POINTER(v);
 		}
 	}
@@ -159,10 +159,10 @@ uint64_to_numeric(uint64_t u)
 }
 
 static Numeric
-uint128_to_numeric(uint128_t u)
+uint128_to_numeric(__uint128_t u)
 {
 	Numeric v;
-	if (unlikely(u >= (((uint128_t)1)<<64))) {
+	if (unlikely(u >= (((__uint128_t)1)<<64))) {
 		/* quadruple bit62 to get bit64 */
 		Numeric bit62 = int64_to_numeric(1ULL<<62);
 		Numeric bit63 = numeric_add_opt_error(bit62, bit62, NULL);
@@ -184,9 +184,9 @@ uint128_to_numeric(uint128_t u)
 }
 
 static Numeric
-int128_to_numeric(int128_t u_)
+int128_to_numeric(__int128_t u_)
 {
-	uint128_t u = u_;
+	__uint128_t u = u_;
 	Numeric v;
 	if (u_ < 0) {
 		Numeric intermediate = uint128_to_numeric(~u + 1);
@@ -234,24 +234,24 @@ Datum int16_avg_accum(PG_FUNCTION_ARGS) {
 	ArrayType *array = AggCheckCallContext(fcinfo, NULL) ?
 		PG_GETARG_ARRAYTYPE_P(0) :
 		PG_GETARG_ARRAYTYPE_P_COPY(0);
-	int128_t *state;
-	int128_t v;
+	xint128 *state;
+	xint128 *v;
 
 	if (ARR_NDIM(array) != 1 ||
 		ARR_DIMS(array)[0] != 2 ||
 		ARR_HASNULL(array) ||
-		ARR_SIZE(array) != ARR_OVERHEAD_NONULLS(1) + sizeof(int128_t) * 2) {
+		ARR_SIZE(array) != ARR_OVERHEAD_NONULLS(1) + sizeof(xint128) * 2) {
 		elog(ERROR, "int16_avg_accum expected 2-element int16 array");
 		PG_RETURN_ARRAYTYPE_P(array);
 	}
 
 	if (PG_ARGISNULL(1)) PG_RETURN_ARRAYTYPE_P(array);
 
-	state = (int128_t *)ARR_DATA_PTR(array);
-	v = *(const int128_t *)PG_GETARG_POINTER(1);
+	state = (xint128 *)ARR_DATA_PTR(array);
+	v = (xint128 *)PG_GETARG_POINTER(1);
 
-	state[0] += v;
-	++state[1];
+	state[0].i += v->i;
+	++state[1].i;
 
 	PG_RETURN_ARRAYTYPE_P(array);
 }
@@ -261,23 +261,23 @@ Datum int16_avg(PG_FUNCTION_ARGS) {
 	ArrayType *array = AggCheckCallContext(fcinfo, NULL) ?
 		PG_GETARG_ARRAYTYPE_P(0) :
 		PG_GETARG_ARRAYTYPE_P_COPY(0);
-	const int128_t *state;
+	const xint128 *state;
 	Numeric sum, count, result;
 
 	if (ARR_NDIM(array) != 1 ||
 		ARR_DIMS(array)[0] != 2 ||
 		ARR_HASNULL(array) ||
-		ARR_SIZE(array) != ARR_OVERHEAD_NONULLS(1) + sizeof(int128_t) * 2) {
+		ARR_SIZE(array) != ARR_OVERHEAD_NONULLS(1) + sizeof(xint128) * 2) {
 		elog(ERROR, "int16_avg expected 2-element int16 array");
 		PG_RETURN_NULL();
 	}
 
-	state = (const int128_t *)ARR_DATA_PTR(array);
+	state = (const xint128 *)ARR_DATA_PTR(array);
 
-	if (unlikely(!state[1])) PG_RETURN_NULL();
+	if (unlikely(!state[1].i)) PG_RETURN_NULL();
 
-	sum = int128_to_numeric(state[0]);
-	count = int128_to_numeric(state[1]);
+	sum = int128_to_numeric(state[0].i);
+	count = int128_to_numeric(state[1].i);
 	result = numeric_div_opt_error(sum, count, NULL);
 	pfree(sum);
 	pfree(count);
@@ -290,24 +290,24 @@ Datum uint16_avg_accum(PG_FUNCTION_ARGS) {
 	ArrayType *array = AggCheckCallContext(fcinfo, NULL) ?
 		PG_GETARG_ARRAYTYPE_P(0) :
 		PG_GETARG_ARRAYTYPE_P_COPY(0);
-	uint128_t *state;
-	uint128_t v;
+	xuint128 *state;
+	xuint128 *v;
 
 	if (ARR_NDIM(array) != 1 ||
 		ARR_DIMS(array)[0] != 2 ||
 		ARR_HASNULL(array) ||
-		ARR_SIZE(array) != ARR_OVERHEAD_NONULLS(1) + sizeof(uint128_t) * 2) {
+		ARR_SIZE(array) != ARR_OVERHEAD_NONULLS(1) + sizeof(xuint128) * 2) {
 		elog(ERROR, "uint16_avg_accum expected 2-element uint16 array");
 		PG_RETURN_ARRAYTYPE_P(array);
 	}
 
 	if (PG_ARGISNULL(1)) PG_RETURN_ARRAYTYPE_P(array);
 
-	state = (uint128_t *)ARR_DATA_PTR(array);
-	v = *(const uint128_t *)PG_GETARG_POINTER(1);
+	state = (xuint128 *)ARR_DATA_PTR(array);
+	v = (xuint128 *)PG_GETARG_POINTER(1);
 
-	state[0] += v;
-	++state[1];
+	state[0].i += v->i;
+	++state[1].i;
 
 	PG_RETURN_ARRAYTYPE_P(array);
 }
@@ -317,23 +317,23 @@ Datum uint16_avg(PG_FUNCTION_ARGS) {
 	ArrayType *array = AggCheckCallContext(fcinfo, NULL) ?
 		PG_GETARG_ARRAYTYPE_P(0) :
 		PG_GETARG_ARRAYTYPE_P_COPY(0);
-	const uint128_t *state;
+	const xuint128 *state;
 	Numeric sum, count, result;
 
 	if (ARR_NDIM(array) != 1 ||
 		ARR_DIMS(array)[0] != 2 ||
 		ARR_HASNULL(array) ||
-		ARR_SIZE(array) != ARR_OVERHEAD_NONULLS(1) + sizeof(uint128_t) * 2) {
+		ARR_SIZE(array) != ARR_OVERHEAD_NONULLS(1) + sizeof(xuint128) * 2) {
 		elog(ERROR, "uint16_avg expected 2-element uint16 array");
 		PG_RETURN_NULL();
 	}
 
-	state = (const uint128_t *)ARR_DATA_PTR(array);
+	state = (const xuint128 *)ARR_DATA_PTR(array);
 
-	if (unlikely(!state[1])) PG_RETURN_NULL();
+	if (unlikely(!state[1].i)) PG_RETURN_NULL();
 
-	sum = uint128_to_numeric(state[0]);
-	count = uint128_to_numeric(state[1]);
+	sum = uint128_to_numeric(state[0].i);
+	count = uint128_to_numeric(state[1].i);
 	result = numeric_div_opt_error(sum, count, NULL);
 	pfree(sum);
 	pfree(count);

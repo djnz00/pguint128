@@ -38,7 +38,7 @@ make_to_hex(uint4, UINT32);
 make_to_hex(uint8, UINT64);
 
 static text*
-_to_hex16(uint128_t value)
+_to_hex16(__uint128_t value)
 {
 	char	   *ptr;
 	const char *digits = "0123456789abcdef";
@@ -60,6 +60,6 @@ PG_FUNCTION_INFO_V1(to_hex_uint16);
 Datum
 to_hex_uint16(PG_FUNCTION_ARGS)
 {
-	uint128_t	arg = *(uint128_t *)PG_GETARG_POINTER(0);
-	PG_RETURN_TEXT_P(_to_hex16(arg));
+	xuint128 *p = (xuint128 *)PG_GETARG_POINTER(0);
+	PG_RETURN_TEXT_P(_to_hex16(p->i));
 }

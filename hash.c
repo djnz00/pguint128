@@ -34,7 +34,7 @@ hashuint8(PG_FUNCTION_ARGS)
 }
 
 static Datum
-hash_uint128(uint128_t val)
+hash_uint128(__uint128_t val)
 {
 	uint32		q0 = (uint32) val;
 	uint32		q1 = (uint32) (val >> 32);
@@ -52,12 +52,14 @@ PG_FUNCTION_INFO_V1(hashint16);
 Datum
 hashint16(PG_FUNCTION_ARGS)
 {
-	return hash_uint128(*(uint128_t *)PG_GETARG_POINTER(0));
+    xint128 *p = (xint128 *)PG_GETARG_POINTER(0);
+	return hash_uint128(p->i);
 }
 
 PG_FUNCTION_INFO_V1(hashuint16);
 Datum
 hashuint16(PG_FUNCTION_ARGS)
 {
-	return hash_uint128(*(uint128_t *)PG_GETARG_POINTER(0));
+    xuint128 *p = (xuint128 *)PG_GETARG_POINTER(0);
+	return hash_uint128(p->i);
 }

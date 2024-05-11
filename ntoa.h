@@ -218,9 +218,9 @@ utoa64(char *buf, uint64_t v)
 }
 
 static unsigned int
-log10_128(uint128_t v)
+log10_128(__uint128_t v)
 {
-     uint128_t f = (uint128_t)10000000000000000000ULL;
+     __uint128_t f = (__uint128_t)10000000000000000000ULL;
      unsigned int n;
 	 if (likely(v < f))
 		 n = log10_64(v);
@@ -237,7 +237,7 @@ log10_128(uint128_t v)
 }
 
 static void
-utoa128(char *buf, uint128_t v)
+utoa128(char *buf, __uint128_t v)
 {
 	unsigned n = log10_128(v);
 	buf[n] = 0;
@@ -245,9 +245,9 @@ utoa128(char *buf, uint128_t v)
 }
 
 static void
-itoa128(char *buf, int128_t v_)
+itoa128(char *buf, __int128_t v_)
 {
-	uint128_t v = v_;
+	__uint128_t v = v_;
 	if (v_ < 0) {
 		*buf++ = '-';
 		v = ~v + 1;

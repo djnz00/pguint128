@@ -370,10 +370,10 @@ uint8send(PG_FUNCTION_ARGS)
 }
 
 static unsigned int
-atou128(const char *s, uint128_t *r)
+atou128(const char *s, __uint128_t *r)
 {
     int c = s[0];
-	uint128_t v;
+	__uint128_t v;
 	unsigned int o;
 	if (unlikely(c < '0' || c > '9')) return 0;
 	v = c - '0';
@@ -387,24 +387,24 @@ atou128(const char *s, uint128_t *r)
 }
 
 static unsigned int
-atoi128(const char *s, int128_t *r)
+atoi128(const char *s, __int128_t *r)
 {
 	if (s[0] == '-') {
-		unsigned int o = atou128(&s[1], (uint128_t *)r);
+		unsigned int o = atou128(&s[1], (__uint128_t *)r);
 		if (!o) return 0;
 		*r = -*r;
 		return o + 1;
 	}
-	return atou128(s, (uint128_t *)r);
+	return atou128(s, (__uint128_t *)r);
 }
 
 PG_FUNCTION_INFO_V1(int16in);
 Datum
 int16in(PG_FUNCTION_ARGS)
 {
-	int128_t *v = (int128_t *)palloc(sizeof(int128_t));
 	const char *s = PG_GETARG_CSTRING(0);
-	unsigned int n = atoi128(s, v);
+	__int128_t i;
+	unsigned int n = atoi128(s, &i);
 
 	/* SQL requires trailing spaces to be ignored while erroring out on other
 	 * "trailing junk" */
@@ -415,16 +415,20 @@ int16in(PG_FUNCTION_ARGS)
 			(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
 			 errmsg("invalid input syntax for type int16: \"%s\"", s)));
 
-	PG_RETURN_POINTER(v);
+	{
+		xint128 *v = (xint128 *)palloc(sizeof(xint128));
+		v->i = i;
+		PG_RETURN_POINTER(v);
+	}
 }
 
 PG_FUNCTION_INFO_V1(int16out);
 Datum
 int16out(PG_FUNCTION_ARGS)
 {
-	int128_t		arg1 = *(int128_t *)PG_GETARG_POINTER(0);
+	xint128			*arg1 = (xint128 *)PG_GETARG_POINTER(0);
 	char			*result = palloc(41);	/* sign, 39 digits, '\0' */
-	itoa128(result, arg1);
+	itoa128(result, arg1->i);
 	PG_RETURN_CSTRING(result);
 }
 
@@ -432,9 +436,9 @@ PG_FUNCTION_INFO_V1(uint16in);
 Datum
 uint16in(PG_FUNCTION_ARGS)
 {
-	uint128_t *v = (uint128_t *)palloc(sizeof(uint128_t));
+	__uint128_t i;
 	const char *s = PG_GETARG_CSTRING(0);
-	unsigned int n = atou128(s, v);
+	unsigned int n = atou128(s, &i);
 
 	/* SQL requires trailing spaces to be ignored while erroring out on other
 	 * "trailing junk" */
@@ -445,16 +449,20 @@ uint16in(PG_FUNCTION_ARGS)
 			(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
 			 errmsg("invalid input syntax for type uint16: \"%s\"", s)));
 
-	PG_RETURN_POINTER(v);
+	{
+	  xuint128 *v = (xuint128 *)palloc(sizeof(xuint128));
+	  v->i = i;
+	  PG_RETURN_POINTER(v);
+	}
 }
 
 PG_FUNCTION_INFO_V1(uint16out);
 Datum
 uint16out(PG_FUNCTION_ARGS)
 {
-	uint128_t		arg1 = *(uint128_t *)PG_GETARG_POINTER(0);
+	xuint128		*arg1 = (xuint128 *)PG_GETARG_POINTER(0);
 	char			*result = palloc(40);	/* 39 digits, '\0' */
-	utoa128(result, arg1);
+	utoa128(result, arg1->i);
 	PG_RETURN_CSTRING(result);
 }
 
@@ -466,12 +474,12 @@ uint16out(PG_FUNCTION_ARGS)
 #if defined(__GNUC__) && !defined(__llvm__)
 #define pg_bswap128(x) __builtin_bswap128(x)
 #else
-inline static uint128_t
-pg_bswap128(uint128_t i)
+inline static __uint128_t
+pg_bswap128(__uint128_t i)
 {
 	return
-		((uint128_t)(pg_bswap64(i))<<64) |
-		(uint128_t)pg_bswap64(i>>64);
+		((__uint128_t)(pg_bswap64(i))<<64) |
+		(__uint128_t)pg_bswap64(i>>64);
 }
 #endif /* __GNUC__ && !__llvm__ */
 #endif /* WORDS_BIGENDIAN */
@@ -482,9 +490,9 @@ Datum
 int16recv(PG_FUNCTION_ARGS)
 {
 	StringInfo buf = (StringInfo)PG_GETARG_POINTER(0);
-	int128_t *v = (int128_t *)palloc(sizeof(int128_t));
+	xint128 *v = (xint128 *)palloc(sizeof(xint128));
 	pq_copymsgbytes(buf, (char *)v, 16);
-	*v = (int128_t)pg_bswap128(*v);
+	v->i = (__int128_t)pg_bswap128(v->i);
 	PG_RETURN_POINTER(v);
 }
 
@@ -492,13 +500,13 @@ PG_FUNCTION_INFO_V1(int16send);
 Datum
 int16send(PG_FUNCTION_ARGS)
 {
-	int128_t value = *(int128_t *)PG_GETARG_POINTER(0);
+	xint128 *v = (xint128 *)PG_GETARG_POINTER(0);
 	StringInfoData buf;
 	pq_begintypsend(&buf);
 	enlargeStringInfo(&buf, 16);
 	Assert(buf.len + 16 <= buf.maxlen);
-        value = (int128_t)pg_bswap128(value);
-	memcpy((char *)(buf.data + buf.len), &value, 16);
+	v->i = (__int128_t)pg_bswap128(v->i);
+	memcpy((char *)(buf.data + buf.len), v, 16);
 	buf.len += 16;
 	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }
@@ -508,9 +516,9 @@ Datum
 uint16recv(PG_FUNCTION_ARGS)
 {
 	StringInfo buf = (StringInfo)PG_GETARG_POINTER(0);
-	uint128_t *v = (uint128_t *)palloc(sizeof(uint128_t));
+	xuint128 *v = (xuint128 *)palloc(sizeof(xuint128));
 	pq_copymsgbytes(buf, (char *)v, 16);
-	*v = pg_bswap128(*v);
+	v->i = pg_bswap128(v->i);
 	PG_RETURN_POINTER(v);
 }
 
@@ -518,13 +526,13 @@ PG_FUNCTION_INFO_V1(uint16send);
 Datum
 uint16send(PG_FUNCTION_ARGS)
 {
-	uint128_t value = *(uint128_t *)PG_GETARG_POINTER(0);
+	xuint128 *v = (xuint128 *)PG_GETARG_POINTER(0);
 	StringInfoData buf;
 	pq_begintypsend(&buf);
 	enlargeStringInfo(&buf, 16);
 	Assert(buf.len + 16 <= buf.maxlen);
-	value = pg_bswap128(value);
-	memcpy((char *)(buf.data + buf.len), &value, 16);
+	v->i = (__int128_t)pg_bswap128(v->i);
+	memcpy((char *)(buf.data + buf.len), v, 16);
 	buf.len += 16;
 	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }

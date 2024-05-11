@@ -63,12 +63,12 @@ c_types = {
     'int2': 'int16',
     'int4': 'int32',
     'int8': 'int64',
-    'int16': 'int128_t',
+    'int16': 'xint128',
     'uint1': 'uint8',
     'uint2': 'uint16',
     'uint4': 'uint32',
     'uint8': 'uint64',
-    'uint16': 'uint128_t'
+    'uint16': 'xuint128'
 }
 
 
@@ -96,7 +96,7 @@ def type_unsigned(typ):
     return typ.startswith('u')
 
 
-def type_large(typ):
+def type_128(typ):
     return typ.endswith('16')
 
 
@@ -152,11 +152,13 @@ Datum
         argvar += 1
         if argtype is None:
             continue
-        if type_large(argtype):
-            f.write("\t{0} arg{1} = *({0} *)PG_GETARG_POINTER({2});\n"
+        if type_128(argtype):
+            f.write("\t{0} *arg{1} = ({0} *)PG_GETARG_POINTER({2});\n"
                     .format(c_types[argtype],
                             argvar,
                             argnum))
+            body = body.replace("arg{0}".format(argvar),
+                                "(arg{0}->i)".format(argvar));
         else:
             f.write("\t{0} arg{1} = PG_GETARG_{2}({3});\n"
                     .format(c_types[argtype],
@@ -164,18 +166,23 @@ Datum
                             c_types[argtype].upper(),
                             argnum))
         argnum += 1
-    if type_large(rettype):
+    if type_128(rettype):
         f.write("\t{0} *result = ({0} *)palloc(sizeof({0}));\n"
                 .format(c_types[rettype]))
-        body = body.replace("result", "(*result)")
-        body = body.replace("&(*result)", "result")
-        body = body.replace("PG_RETURN_{0}(0)".format(c_types[rettype].upper()), "{ *result = 0; PG_RETURN_POINTER(result); }")
+        body = body.replace("result", "(result->i)")
+        body = body.replace("(xuint128) (result->i)",
+                            "(__uint128_t) (result->i)");
+        body = body.replace("(xint128) (result->i)",
+                            "(__int128_t) (result->i)");
+        body = body.replace("PG_RETURN_{0}(0)".format(c_types[rettype].upper()), "{ result->i = 0; PG_RETURN_POINTER(result); }")
     else:
         f.write("\t{0} result;\n".format(c_types[rettype]))
+        body = body.replace("(xuint128) result", "(__uint128_t) result");
+        body = body.replace("(xint128) result", "(__int128_t) result");
     f.write("\n")
     f.write("\t" + body.replace("\n", "\n\t").replace("\n\t\n", "\n\n"))
     f.write("\n")
-    if type_large(rettype):
+    if type_128(rettype):
         f.write("""
 \tPG_RETURN_POINTER(result);
 }}
@@ -283,15 +290,15 @@ def write_cmp_sql_function(f, leftarg, rightarg):
 
 def write_sortsupport_c_function(f, typ, pgversion):
     if pgversion >= 9.2:
-        if type_large(typ):
+        if type_128(typ):
             f.write("""
 static int
 bt{typ}fastcmp(Datum x, Datum y, SortSupport ssup)
 {{
-\t{ctype} a = *({Ctype} *)DatumGetPointer(x);
-\t{ctype} b = *({Ctype} *)DatumGetPointer(y);
+\t{ctype} *a = ({Ctype} *)DatumGetPointer(x);
+\t{ctype} *b = ({Ctype} *)DatumGetPointer(y);
 
-\treturn (a > b) - (a < b);
+\treturn (a->i > b->i) - (a->i < b->i);
 }}
 
 PG_FUNCTION_INFO_V1(bt{typ}sortsupport);
