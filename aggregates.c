@@ -142,62 +142,69 @@ Datum uint8_avg_accum(PG_FUNCTION_ARGS) {
 static Numeric
 uint64_to_numeric(uint64_t u)
 {
-	Numeric v;
 	if (unlikely(u & (1ULL<<63))) {
 		/* double bit62 to get bit63 */
 		Numeric bit62 = int64_to_numeric(1ULL<<62);
 		Numeric bit63 = numeric_add_opt_error(bit62, bit62, NULL);
 		Numeric intermediate = int64_to_numeric(u & ~(1ULL<<63));
-		v = numeric_add_opt_error(intermediate, bit63, NULL);
+		Numeric v = numeric_add_opt_error(intermediate, bit63, NULL);
 		pfree(bit62);
 		pfree(bit63);
 		pfree(intermediate);
-	} else {
-		v = int64_to_numeric(u);
+		return v;
 	}
-	return v;
+	return int64_to_numeric(u);
+}
+
+/* for use by callers with pre-calculated bit63 */
+static Numeric
+uint64_to_numeric_(uint64_t u, Numeric bit63)
+{
+	if (unlikely(u & (1ULL<<63))) {
+		Numeric intermediate = int64_to_numeric(u & ~(1ULL<<63));
+		Numeric v = numeric_add_opt_error(intermediate, bit63, NULL);
+		pfree(intermediate);
+		return v;
+	}
+	return int64_to_numeric(u);
 }
 
 static Numeric
 uint128_to_numeric(__uint128_t u)
 {
-	Numeric v;
 	if (unlikely(u >= (((__uint128_t)1)<<64))) {
 		/* quadruple bit62 to get bit64 */
 		Numeric bit62 = int64_to_numeric(1ULL<<62);
 		Numeric bit63 = numeric_add_opt_error(bit62, bit62, NULL);
 		Numeric bit64 = numeric_add_opt_error(bit63, bit63, NULL);
-		Numeric high = uint64_to_numeric(u>>64);
-		Numeric low = uint64_to_numeric(u);
+		Numeric high = uint64_to_numeric_(u>>64, bit63);
+		Numeric low = uint64_to_numeric_(u, bit63);
 		Numeric intermediate = numeric_mul_opt_error(high, bit64, NULL);
-		v = numeric_add_opt_error(intermediate, low, NULL);
+		Numeric v = numeric_add_opt_error(intermediate, low, NULL);
 		pfree(bit62);
 		pfree(bit63);
 		pfree(bit64);
 		pfree(high);
 		pfree(low);
 		pfree(intermediate);
-	} else {
-		v = uint64_to_numeric(u);
+		return v;
 	}
-	return v;
+	return uint64_to_numeric(u);
 }
 
 static Numeric
 int128_to_numeric(__int128_t u_)
 {
 	__uint128_t u = u_;
-	Numeric v;
 	if (u_ < 0) {
 		Numeric intermediate = uint128_to_numeric(~u + 1);
-		v = DatumGetNumeric(
-				DirectFunctionCall1(
-					numeric_uminus, NumericGetDatum(intermediate)));
+		Numeric v = DatumGetNumeric(
+			DirectFunctionCall1(
+				numeric_uminus, NumericGetDatum(intermediate)));
 		pfree(intermediate);
-	} else {
-		v = uint128_to_numeric(u);
+		return v;
 	}
-	return v;
+	return uint128_to_numeric(u);
 }
 
 PG_FUNCTION_INFO_V1(uint8_avg);
