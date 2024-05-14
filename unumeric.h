@@ -1,4 +1,7 @@
+#include <stdio.h>
+
 #include "uint.h"
+#include "ntoa.h"
 
 #include <utils/numeric.h>
 #include <utils/fmgrprotos.h>
@@ -17,15 +20,46 @@ numeric_lt_(Numeric l, Numeric r)
 		numeric_lt, NumericGetDatum(l), NumericGetDatum(r)));
 }
 
+#if 0
+inline static void
+numeric_log_(char *fmt, Numeric n)
+{
+	char *s = DatumGetCString(DirectFunctionCall1(
+		numeric_out, NumericGetDatum(n)));
+	fprintf(stderr, fmt, s); fputc('\n', stderr); fflush(stderr);
+	pfree(s);
+}
+
+inline static void
+int128_log_(char *fmt, __int128_t u)
+{
+	char s[40];
+	itoa128(s, u);
+	fprintf(stderr, fmt, s); fputc('\n', stderr); fflush(stderr);
+}
+
+inline static void
+uint128_log_(char *fmt, __uint128_t u)
+{
+	char s[40];
+	utoa128(s, u);
+	fprintf(stderr, fmt, s); fputc('\n', stderr); fflush(stderr);
+}
+#endif
+
 inline static uint64_t
 numeric_to_uint64_(Numeric n, Numeric bit63)
 {
+	/* numeric_log_("numeric_to_uint64_(%s)", n); */
+	/* numeric_log_("numeric_to_uint64_() bit63=%s", bit63); */
 	if (unlikely(!numeric_lt_(n, bit63))) {
 		Numeric high = numeric_div_opt_error(n, bit63, NULL);
 		Numeric low = numeric_mod_opt_error(n, bit63, NULL);
 		uint64_t v =
 			(((uint64_t)numeric_to_int64(high))<<63) |
 			numeric_to_int64(low);
+		/* numeric_log_("numeric_to_uint64_() high=%s", high); */
+		/* numeric_log_("numeric_to_uint64_() low=%s", low); */
 		pfree(high);
 		pfree(low);
 		return v;
@@ -47,13 +81,19 @@ numeric_to_uint64(Numeric n)
 inline static __uint128_t
 numeric_to_uint128_(Numeric n, Numeric bit63)
 {
+	/* numeric_log_("numeric_to_uint128_(%s)", n); */
+	/* numeric_log_("numeric_to_uint128_() bit63=%s", bit63); */
 	if (unlikely(!numeric_lt_(n, bit63))) {
 		Numeric high = numeric_div_opt_error(n, bit63, NULL);
 		Numeric low = numeric_mod_opt_error(n, bit63, NULL);
 		__uint128_t v;
+		/* numeric_log_("numeric_to_uint128_() high=%s", high); */
+		/* numeric_log_("numeric_to_uint128_() low=%s", low); */
 		if (unlikely(!numeric_lt_(high, bit63))) {
 			Numeric high_high = numeric_div_opt_error(high, bit63, NULL);
 			Numeric high_low = numeric_mod_opt_error(high, bit63, NULL);
+			/* numeric_log_("numeric_to_uint128_() high_high=%s", high_high); */
+			/* numeric_log_("numeric_to_uint128_() high_low=%s", high_low); */
 			v = (((__uint128_t)numeric_to_int64(high_high))<<126) |
 				(((__uint128_t)numeric_to_int64(high_low))<<63) |
 				numeric_to_int64(low);
@@ -65,6 +105,7 @@ numeric_to_uint128_(Numeric n, Numeric bit63)
 		}
 		pfree(high);
 		pfree(low);
+		/* uint128_log_("numeric_to_uint128_() v=%s", v); */
 		return v;
 	}
 	return numeric_to_int64(n);
@@ -91,11 +132,16 @@ numeric_neg(Numeric v)
 inline static __int128_t
 numeric_to_int128_(Numeric n, Numeric zero, Numeric bit63)
 {
+	/* numeric_log_("numeric_to_int128_(%s)", n); */
 	if (numeric_lt_(n, zero)) {
 		Numeric m = numeric_neg(n);
 		__uint128_t v = numeric_to_uint128_(m, bit63);
+		/* numeric_log_("numeric_to_int128_() m=%s", m); */
 		pfree(m);
+		/* uint128_log_("numeric_to_int128_() v=%s", v); */
 		v = ~v + 1;
+		/* uint128_log_("numeric_to_int128_() v=%s", v); */
+		/* int128_log_("numeric_to_int128_() (__int128_t)v=%s", v); */
 		return v;
 	}
 	return numeric_to_uint128_(n, bit63);

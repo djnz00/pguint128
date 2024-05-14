@@ -46,5 +46,8 @@ ntoa_test: ntoa_test.o
 ntoa-check: ntoa_test
 	./ntoa_test
 
+$(OBJS): uint.h
 inout.o: ntoa.h
 ntoa_test.o: ntoa.h
+misc.o: unumeric.h
+aggregates.o: unumeric.h

@@ -51,12 +51,12 @@ CREATE FUNCTION int1_from_real(real) RETURNS int1
     AS '$libdir/uint', 'int1_from_real';
 
 CREATE CAST (double precision AS int1)
-	WITH FUNCTION int1_from_double AS ASSIGNMENT;
+    WITH FUNCTION int1_from_double AS ASSIGNMENT;
 CREATE CAST (numeric AS int1) WITH FUNCTION int1_from_numeric AS ASSIGNMENT;
 CREATE CAST (real AS int1) WITH FUNCTION int1_from_real AS ASSIGNMENT;
 
 CREATE CAST (int1 AS double precision)
-	WITH FUNCTION int1_to_double AS IMPLICIT;
+    WITH FUNCTION int1_to_double AS IMPLICIT;
 CREATE CAST (int1 AS numeric) WITH FUNCTION int1_to_numeric AS IMPLICIT;
 CREATE CAST (int1 AS real) WITH FUNCTION int1_to_real AS IMPLICIT;
 
@@ -114,12 +114,12 @@ CREATE FUNCTION uint1_from_real(real) RETURNS uint1
     AS '$libdir/uint', 'uint1_from_real';
 
 CREATE CAST (double precision AS uint1)
-	WITH FUNCTION uint1_from_double AS ASSIGNMENT;
+    WITH FUNCTION uint1_from_double AS ASSIGNMENT;
 CREATE CAST (numeric AS uint1) WITH FUNCTION uint1_from_numeric AS ASSIGNMENT;
 CREATE CAST (real AS uint1) WITH FUNCTION uint1_from_real AS ASSIGNMENT;
 
 CREATE CAST (uint1 AS double precision)
-	WITH FUNCTION uint1_to_double AS IMPLICIT;
+    WITH FUNCTION uint1_to_double AS IMPLICIT;
 CREATE CAST (uint1 AS numeric) WITH FUNCTION uint1_to_numeric AS IMPLICIT;
 CREATE CAST (uint1 AS real) WITH FUNCTION uint1_to_real AS IMPLICIT;
 
@@ -177,12 +177,12 @@ CREATE FUNCTION uint2_from_real(real) RETURNS uint2
     AS '$libdir/uint', 'uint2_from_real';
 
 CREATE CAST (double precision AS uint2)
-	WITH FUNCTION uint2_from_double AS ASSIGNMENT;
+    WITH FUNCTION uint2_from_double AS ASSIGNMENT;
 CREATE CAST (numeric AS uint2) WITH FUNCTION uint2_from_numeric AS ASSIGNMENT;
 CREATE CAST (real AS uint2) WITH FUNCTION uint2_from_real AS ASSIGNMENT;
 
 CREATE CAST (uint2 AS double precision)
-	WITH FUNCTION uint2_to_double AS IMPLICIT;
+    WITH FUNCTION uint2_to_double AS IMPLICIT;
 CREATE CAST (uint2 AS numeric) WITH FUNCTION uint2_to_numeric AS IMPLICIT;
 CREATE CAST (uint2 AS real) WITH FUNCTION uint2_to_real AS IMPLICIT;
 
@@ -240,12 +240,12 @@ CREATE FUNCTION uint4_from_real(real) RETURNS uint4
     AS '$libdir/uint', 'uint4_from_real';
 
 CREATE CAST (double precision AS uint4)
-	WITH FUNCTION uint4_from_double AS ASSIGNMENT;
+    WITH FUNCTION uint4_from_double AS ASSIGNMENT;
 CREATE CAST (numeric AS uint4) WITH FUNCTION uint4_from_numeric AS ASSIGNMENT;
 CREATE CAST (real AS uint4) WITH FUNCTION uint4_from_real AS ASSIGNMENT;
 
 CREATE CAST (uint4 AS double precision)
-	WITH FUNCTION uint4_to_double AS IMPLICIT;
+    WITH FUNCTION uint4_to_double AS IMPLICIT;
 CREATE CAST (uint4 AS numeric) WITH FUNCTION uint4_to_numeric AS IMPLICIT;
 CREATE CAST (uint4 AS real) WITH FUNCTION uint4_to_real AS IMPLICIT;
 
@@ -303,12 +303,12 @@ CREATE FUNCTION uint8_from_real(real) RETURNS uint8
     AS '$libdir/uint', 'uint8_from_real';
 
 CREATE CAST (double precision AS uint8)
-	WITH FUNCTION uint8_from_double AS ASSIGNMENT;
+    WITH FUNCTION uint8_from_double AS ASSIGNMENT;
 CREATE CAST (numeric AS uint8) WITH FUNCTION uint8_from_numeric AS ASSIGNMENT;
 CREATE CAST (real AS uint8) WITH FUNCTION uint8_from_real AS ASSIGNMENT;
 
 CREATE CAST (uint8 AS double precision)
-	WITH FUNCTION uint8_to_double AS IMPLICIT;
+    WITH FUNCTION uint8_to_double AS IMPLICIT;
 CREATE CAST (uint8 AS numeric) WITH FUNCTION uint8_to_numeric AS IMPLICIT;
 CREATE CAST (uint8 AS real) WITH FUNCTION uint8_to_real AS IMPLICIT;
 
@@ -365,13 +365,17 @@ CREATE FUNCTION int16_from_real(real) RETURNS int16
     AS '$libdir/uint', 'int16_from_real';
 
 CREATE CAST (double precision AS int16)
-	WITH FUNCTION int16_from_double AS ASSIGNMENT;
-CREATE CAST (numeric AS int16) WITH FUNCTION int16_from_numeric AS ASSIGNMENT;
+    WITH FUNCTION int16_from_double AS ASSIGNMENT;
+-- CREATE CAST (numeric AS int16)
+--     WITH FUNCTION int16_from_numeric AS ASSIGNMENT;
+CREATE CAST (numeric AS int16) WITH INOUT AS ASSIGNMENT;
 CREATE CAST (real AS int16) WITH FUNCTION int16_from_real AS ASSIGNMENT;
 
 CREATE CAST (int16 AS double precision)
-	WITH FUNCTION int16_to_double AS IMPLICIT;
-CREATE CAST (int16 AS numeric) WITH FUNCTION int16_to_numeric AS IMPLICIT;
+    WITH FUNCTION int16_to_double AS IMPLICIT;
+-- CREATE CAST (int16 AS numeric)
+--     WITH FUNCTION int16_to_numeric AS IMPLICIT;
+CREATE CAST (int16 AS numeric) WITH INOUT AS IMPLICIT;
 CREATE CAST (int16 AS real) WITH FUNCTION int16_to_real AS IMPLICIT;
 
 
@@ -427,13 +431,17 @@ CREATE FUNCTION uint16_from_real(real) RETURNS uint16
     AS '$libdir/uint', 'uint16_from_real';
 
 CREATE CAST (double precision AS uint16)
-	WITH FUNCTION uint16_from_double AS ASSIGNMENT;
-CREATE CAST (numeric AS uint16) WITH FUNCTION uint16_from_numeric AS ASSIGNMENT;
+    WITH FUNCTION uint16_from_double AS ASSIGNMENT;
+-- CREATE CAST (numeric AS uint16)
+--     WITH FUNCTION uint16_from_numeric AS ASSIGNMENT;
+CREATE CAST (numeric AS uint16) WITH INOUT AS ASSIGNMENT;
 CREATE CAST (real AS uint16) WITH FUNCTION uint16_from_real AS ASSIGNMENT;
 
 CREATE CAST (uint16 AS double precision)
-	WITH FUNCTION uint16_to_double AS IMPLICIT;
-CREATE CAST (uint16 AS numeric) WITH FUNCTION uint16_to_numeric AS IMPLICIT;
+    WITH FUNCTION uint16_to_double AS IMPLICIT;
+-- CREATE CAST (uint16 AS numeric)
+--     WITH FUNCTION uint16_to_numeric AS IMPLICIT;
+CREATE CAST (uint16 AS numeric) WITH INOUT AS IMPLICIT;
 CREATE CAST (uint16 AS real) WITH FUNCTION uint16_to_real AS IMPLICIT;
 
 
