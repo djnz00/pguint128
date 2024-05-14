@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "uint.h"
-#include "ntoa.h"
+/* #include "ntoa.h" */
 
 #include <utils/numeric.h>
 #include <utils/fmgrprotos.h>
