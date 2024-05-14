@@ -15,13 +15,14 @@ This is forked from @petere's original work, adding:
 
 - fast itoa and utoa functions to replace use of sprintf("%u")
 - binary send/receive for all types
-- 128-bit integer types
+- binary casts for all types to/from numeric, double precision and real
+- 128-bit signed and unsigned integer types
 
 Installation
 ------------
 
-PostgreSQL version 9.1 or later is required.  Currently, only 64-bit
-builds are supported.
+PostgreSQL version 9.1 or later is required.
+Only 64-bit builds are supported.
 
 To build and install this module:
 
