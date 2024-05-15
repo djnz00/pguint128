@@ -141,7 +141,7 @@ numeric_to_uint64(Numeric n)
 		Numeric high_down = numeric_mul_opt_error(n, bit1_, NULL);
 		Numeric high_floor = numeric_floor_(high_down);
 		Numeric high_up = numeric_mul_opt_error(high_floor, bit1, NULL);
-		Numeric low = numeric_sub_opt_error(high, high_up, NULL);
+		Numeric low = numeric_sub_opt_error(n, high_up, NULL);
 		uint64_t v =
 			(((uint64_t)numeric_to_int64(high_floor))<<1) |
 			numeric_to_int64(low);
@@ -199,7 +199,7 @@ numeric_to_uint128(Numeric n)
 			pfree(hhigh_up);
 			pfree(hlow);
 		} else {
-			v = (((__uint128_t)numeric_to_int64(high))<<63) |
+			v = (((__uint128_t)numeric_to_int64(high_floor))<<63) |
 				numeric_to_int64(low);
 		}
 		pfree(high_down);
