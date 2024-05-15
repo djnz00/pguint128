@@ -265,10 +265,13 @@ uint128_to_numeric(__uint128_t u)
 		{
 			Numeric high = uint64_to_numeric(u>>64);
 			Numeric low = uint64_to_numeric(u);
-			Numeric intermediate = numeric_mul_opt_error(high, bit64, NULL);
-			Numeric v = numeric_add_opt_error(intermediate, low, NULL);
+			Numeric high_up = numeric_mul_opt_error(high, bit64, NULL);
+			Numeric intermediate = numeric_add_opt_error(high_up, low, NULL);
+			/* flooring is necessary following the multiply, regrettably */
+			Numeric v = numeric_floor_(intermediate);
 			pfree(high);
 			pfree(low);
+			pfree(high_up);
 			pfree(intermediate);
 			return v;
 		}
