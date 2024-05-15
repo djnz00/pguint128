@@ -13,7 +13,7 @@ extension_version = 0
 
 EXTENSION = uint
 MODULE_big = uint
-OBJS = aggregates.o hash.o hex.o inout.o magic.o misc.o operators.o
+OBJS = aggregates.o hash.o hex.o inout.o magic.o misc.o operators.o unumeric.o
 DATA_built = uint--$(extension_version).sql
 
 REGRESS = init hash hex operators misc drop
@@ -51,3 +51,4 @@ inout.o: ntoa.h
 ntoa_test.o: ntoa.h
 misc.o: unumeric.h
 aggregates.o: unumeric.h
+unumeric.o: unumeric.h

@@ -366,16 +366,14 @@ CREATE FUNCTION int16_from_real(real) RETURNS int16
 
 CREATE CAST (double precision AS int16)
     WITH FUNCTION int16_from_double AS ASSIGNMENT;
--- CREATE CAST (numeric AS int16)
---     WITH FUNCTION int16_from_numeric AS ASSIGNMENT;
-CREATE CAST (numeric AS int16) WITH INOUT AS ASSIGNMENT;
+CREATE CAST (numeric AS int16)
+    WITH FUNCTION int16_from_numeric AS ASSIGNMENT;
 CREATE CAST (real AS int16) WITH FUNCTION int16_from_real AS ASSIGNMENT;
 
 CREATE CAST (int16 AS double precision)
     WITH FUNCTION int16_to_double AS IMPLICIT;
--- CREATE CAST (int16 AS numeric)
---     WITH FUNCTION int16_to_numeric AS IMPLICIT;
-CREATE CAST (int16 AS numeric) WITH INOUT AS IMPLICIT;
+CREATE CAST (int16 AS numeric)
+    WITH FUNCTION int16_to_numeric AS IMPLICIT;
 CREATE CAST (int16 AS real) WITH FUNCTION int16_to_real AS IMPLICIT;
 
 
@@ -432,16 +430,14 @@ CREATE FUNCTION uint16_from_real(real) RETURNS uint16
 
 CREATE CAST (double precision AS uint16)
     WITH FUNCTION uint16_from_double AS ASSIGNMENT;
--- CREATE CAST (numeric AS uint16)
---     WITH FUNCTION uint16_from_numeric AS ASSIGNMENT;
-CREATE CAST (numeric AS uint16) WITH INOUT AS ASSIGNMENT;
+CREATE CAST (numeric AS uint16)
+    WITH FUNCTION uint16_from_numeric AS ASSIGNMENT;
 CREATE CAST (real AS uint16) WITH FUNCTION uint16_from_real AS ASSIGNMENT;
 
 CREATE CAST (uint16 AS double precision)
     WITH FUNCTION uint16_to_double AS IMPLICIT;
--- CREATE CAST (uint16 AS numeric)
---     WITH FUNCTION uint16_to_numeric AS IMPLICIT;
-CREATE CAST (uint16 AS numeric) WITH INOUT AS IMPLICIT;
+CREATE CAST (uint16 AS numeric)
+    WITH FUNCTION uint16_to_numeric AS IMPLICIT;
 CREATE CAST (uint16 AS real) WITH FUNCTION uint16_to_real AS IMPLICIT;
 
 
@@ -475,3 +471,9 @@ CREATE FUNCTION int16_avg(int16[]) RETURNS numeric
 CREATE FUNCTION uint16_avg(uint16[]) RETURNS numeric
     IMMUTABLE STRICT LANGUAGE C
     AS '$libdir/uint', 'uint16_avg';
+
+CREATE FUNCTION uint_init() RETURNS void
+    IMMUTABLE STRICT LANGUAGE C
+    AS '$libdir/uint', 'uint_init';
+
+SELECT uint_init();

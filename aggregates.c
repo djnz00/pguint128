@@ -2,6 +2,7 @@
 #include <fmgr.h>
 #include <utils/array.h>
 
+#include "uint.h"
 #include "unumeric.h"
 
 #define make_sum_func(argtype, ARGTYPE, RETTYPE) \

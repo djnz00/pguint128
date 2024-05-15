@@ -1,6 +1,7 @@
 #include <postgres.h>
 #include <fmgr.h>
 
+#include "uint.h"
 #include "unumeric.h"
 
 
