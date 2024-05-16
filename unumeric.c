@@ -39,6 +39,54 @@ uint128_log_(char *fmt, __uint128_t u)
 }
 #endif
 
+static Numeric
+numeric_in_(const char *s)
+{
+	int32_t dp = -1;
+	int32_t len = 0;
+	int32_t typmod;
+	{
+		int c;
+		while ((c = s[len])) { if (c == '.') dp = len; ++len; }
+	}
+	/* voodoo - see PG numeric.c make_numeric_typmod() */
+	if (dp >= 0) {
+		--len;
+		typmod = ((len<<16) | (len - dp)) + 4;
+	} else {
+		typmod = (len<<16) + 4;
+	}
+	return DatumGetNumeric(DirectFunctionCall3(numeric_in,
+		CStringGetDatum(s), (Datum)0, (Datum)typmod));
+}
+static Numeric
+numeric_round_(Numeric v)
+{
+	return DatumGetNumeric(DirectFunctionCall2(
+		numeric_round, NumericGetDatum(v), Int8GetDatum(0)));
+}
+
+static Numeric
+numeric_floor_(Numeric v)
+{
+	return DatumGetNumeric(DirectFunctionCall1(
+		numeric_floor, NumericGetDatum(v)));
+}
+
+static Numeric
+numeric_uminus_(Numeric v)
+{
+	return DatumGetNumeric(DirectFunctionCall1(
+		numeric_uminus, NumericGetDatum(v)));
+}
+
+static bool
+numeric_lt_(Numeric l, Numeric r)
+{
+	return DatumGetBool(DirectFunctionCall2(
+		numeric_lt, NumericGetDatum(l), NumericGetDatum(r)));
+}
+
 /* PG numeric division is lossy, so we ensure accuracy by multiplying
  * by reciprocals rather than dividing */
 
@@ -63,22 +111,15 @@ static void uint_init_()
 	/* these cached values need to endure */
 	old = MemoryContextSwitchTo(CacheMemoryContext);
 
-	zero = DatumGetNumeric(DirectFunctionCall1(numeric_in, CStringGetDatum(
-		"0")));
-	bit1 = DatumGetNumeric(DirectFunctionCall1(numeric_in, CStringGetDatum(
-		"2")));
-	bit1_ = DatumGetNumeric(DirectFunctionCall1(numeric_in, CStringGetDatum(
-		".5")));
-	bit2 = DatumGetNumeric(DirectFunctionCall1(numeric_in, CStringGetDatum(
-		"4")));
-	bit2_ = DatumGetNumeric(DirectFunctionCall1(numeric_in, CStringGetDatum(
-		".25")));
-	bit63 = DatumGetNumeric(DirectFunctionCall1(numeric_in, CStringGetDatum(
-		"9223372036854775808")));
-	bit63_ = DatumGetNumeric(DirectFunctionCall1(numeric_in, CStringGetDatum(
-		".000000000000000000108420217248550443400745280086994171142578125")));
-	bit64 = DatumGetNumeric(DirectFunctionCall1(numeric_in, CStringGetDatum(
-		"18446744073709551616")));
+	zero = numeric_in_("0");
+	bit1 = numeric_in_("2");
+	bit1_ = numeric_in_(".5");
+	bit2 = numeric_in_("4");
+	bit2_ = numeric_in_(".25");
+	bit63 = numeric_in_("9223372036854775808");
+	bit63_ = numeric_in_(
+		".000000000000000000108420217248550443400745280086994171142578125");
+	bit64 = numeric_in_("18446744073709551616");
 
 	MemoryContextSwitchTo(old);
 
@@ -107,27 +148,6 @@ numeric_to_int64(Numeric n)
 {
 	return DatumGetInt64(DirectFunctionCall1(
 		numeric_int8, NumericGetDatum(n)));
-}
-
-static Numeric
-numeric_floor_(Numeric v)
-{
-	return DatumGetNumeric(DirectFunctionCall1(
-		numeric_floor, NumericGetDatum(v)));
-}
-
-static Numeric
-numeric_uminus_(Numeric v)
-{
-	return DatumGetNumeric(DirectFunctionCall1(
-		numeric_uminus, NumericGetDatum(v)));
-}
-
-static bool
-numeric_lt_(Numeric l, Numeric r)
-{
-	return DatumGetBool(DirectFunctionCall2(
-		numeric_lt, NumericGetDatum(l), NumericGetDatum(r)));
 }
 
 uint64_t
