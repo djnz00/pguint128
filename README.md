@@ -18,6 +18,9 @@ This is forked from @petere's original work, adding:
 - binary casts for all types to/from numeric, double precision and real
 - 128-bit signed and unsigned integer types
 
+Current clang and gcc versions are supported as of May 2024. YMMV with
+other compilers. MSVC completely lacks support for 128bit integers.
+
 Installation
 ------------
 
@@ -55,8 +58,7 @@ SELECT avg(a) FROM foo;
 ```
 
 The types come with a sizable set of operators and functions, index
-support, etc.  Some pieces are still missing, but they are being
-worked on.  If there is anything you can't find, let me know.
+support, etc.  If there is anything you can't find, let me know.
 
 Discussion
 ----------
