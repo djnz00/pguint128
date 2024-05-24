@@ -24,6 +24,7 @@
 #define unlikely(x) (x)
 #endif
 
+/* caller-assured pre-condition: v != 0 */
 /* CLZ first choice: gcc/clang intrinsic */
 #ifdef __GNUC__
 #define clz32(v) __builtin_clz(v)
@@ -33,23 +34,8 @@
 /* CLZ second choice: MSVC intrinsic */
 #ifdef _MSC_VER
 #include <intrin.h>
-/* caller-assured pre-condition: v != 0 */
-static uint32_t
-__forceinline clz32_(uint32_t v)
-{
-    DWORD n;
-    _BitScanReverse(&n, v);
-	return 31 - n;
-}
-static uint64_t
-__forceinline clz64_(uint64_t v)
-{
-    DWORD n;
-    _BitScanReverse64(&n, v);
-	return 63 - n;
-}
-#define clz32(v) clz32_(v)
-#define clz64(v) clz64_(v)
+#define clz32(v) __lzcnt(v)
+#define clz64(v) __lzcnt64(v)
 #endif /* _MSC_VER */
 
 /* CLZ third choice: fallback C code */
