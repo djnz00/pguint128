@@ -606,7 +606,7 @@ if (!SAMESIGN(result, arg1))
                             .format(lefttype=leftarg, righttype=rightarg,
                                     func=sql_funcname,
                                     arg=leftarg,
-                                    context=("IMPLICIT" if type_bits(leftarg) < type_bits(rightarg) else "ASSIGNMENT")))
+                                    context=("IMPLICIT" if type_bits(leftarg) <= type_bits(rightarg) else "ASSIGNMENT")))
 
     for arg in new_types:
         for op in ['&', '|', '#']:
