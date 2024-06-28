@@ -4,7 +4,7 @@
  *   this is a single instruction on all modern architectures; the
  *   implementation falls back to C code
  * - convert log2 to log10 using small lookup tables
- * - uses log10 to jump forward and output decimal backwards
+ * - use log10 to jump forward and output decimal backwards
  */
 
 /* define likely/unlikely if needed */
