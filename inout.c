@@ -244,7 +244,7 @@ PG_FUNCTION_INFO_V1(uint2send);
 Datum
 uint2send(PG_FUNCTION_ARGS)
 {
-	uint8		arg1 = PG_GETARG_UINT16(0);
+	uint16		arg1 = PG_GETARG_UINT16(0);
 	StringInfoData buf;
 
 	pq_begintypsend(&buf);
@@ -286,7 +286,7 @@ PG_FUNCTION_INFO_V1(uint4send);
 Datum
 uint4send(PG_FUNCTION_ARGS)
 {
-	uint8		arg1 = PG_GETARG_UINT32(0);
+	uint32		arg1 = PG_GETARG_UINT32(0);
 	StringInfoData buf;
 
 	pq_begintypsend(&buf);
@@ -361,7 +361,7 @@ PG_FUNCTION_INFO_V1(uint8send);
 Datum
 uint8send(PG_FUNCTION_ARGS)
 {
-	uint8		arg1 = PG_GETARG_UINT64(0);
+	uint64		arg1 = PG_GETARG_UINT64(0);
 	StringInfoData buf;
 
 	pq_begintypsend(&buf);
