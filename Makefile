@@ -27,7 +27,10 @@ include $(PGXS)
 uint--$(extension_version).sql: uint.sql hash.sql hex.sql operators.sql
 	cat $^ >$@
 
-PYTHON ?= python
+# prevent PYTHON from being defined as the empty string
+ifeq ($(strip $(PYTHON)),)
+PYTHON := python
+endif
 
 operators.c operators.sql test/sql/operators.sql: generate.py
 	$(PYTHON) $< $(MAJORVERSION)
